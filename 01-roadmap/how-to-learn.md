@@ -1,79 +1,110 @@
-# How to Learn
+# How to Learn — Visual Notes
 
-Most roadmaps tell you what to learn. This one tells you how, so you don't get stuck, memorise without understanding, or quit after two weeks. A professional hacker isn't made by reading a hundred pages, but by a repeatable method: understand, practise in a lab, break it down, write it, explain it, review it.
+Lab only · own machine / own private lab · test data only
 
-## Learning is a design, not luck
+Most roadmaps say what to learn. This one says how — so you don't get stuck, memorise without understanding, or quit after two weeks. Method: understand, practise, break down, write, explain, review.
 
-Think of it like building a house. Fundamentals, Linux, and networks are the foundation — without them, advanced topics collapse. One topic, one lab, one note page at a time is one brick at a time, not ten topics in a day. Check each brick: can you explain it, and can you do it again tomorrow without notes? If not, the brick isn't set — do it again before stacking more on a weak one. Your notes are the blueprint; if you can't find a note later, you'll rebuild the same brick again and again.
+## 1. Learning is a design, not luck
 
-## Watching is not learning
+Foundation (fundamentals · Linux · networks) → one brick at a time (one topic · one lab · one note page) → check each brick (explain it? do it tomorrow, no notes?) → no: redo; yes: next brick.
 
-Watching a video or reading a tutorial feels easy, and your brain says "I understand this." Then you close the video and can't do it alone. That's normal — understanding by watching is shallow; understanding by doing is deep. Test yourself honestly after every topic: close all notes and videos, try the lab task alone, and explain what you did out loud in plain English. If you can do all three, you learned it. If you can't, you only watched it. Go back to the lab, not to another video.
+Without the foundation, advanced topics collapse. Ten topics a day = ten weak bricks. Notes are the blueprint — unfindable notes = rebuilding the same brick.
 
-## One tool deep beats ten tools shallow
+## 2. Watching is not learning
 
-Beginners collect tool names and can't explain one tool's output fully. Do the opposite: for one tool, learn what it is in one sentence, why it's used, when to use it and when not to, what its output means line by line, one safe lab example with test data only, and the mistakes you made with it. Once you can do that for one tool, the next gets easier, because you already know how to learn a tool. Depth first, breadth later.
+- Watching/reading: feels easy, brain says "I understand" — close the video, can't do it alone. Shallow.
+- Doing: harder, slower, sticks — close the notes, can still do it. Deep.
 
-## Notes are proof, not decoration
+**Honest test per topic:** notes + videos closed, lab task alone, explain it out loud plainly. All three = learned. Any fail = only watched — back to the lab, not another video.
 
-Notes have two jobs. They help future you — in three months you'll forget details, and good notes let you rebuild a lab in minutes instead of days — and they prove your work, because employers and interviewers trust written proof more than "I watched a course." Copied text with no examples, no output meaning, and no mistakes noted is not notes. Good notes are your own words, your own lab example, your own output, your own mistakes, and your own questions.
+## 3. One tool deep beats ten tools shallow
 
-## The method, in practice
+Beginners collect tool names, can't explain one output fully. Do the opposite:
 
-Use this loop for every topic. It looks long on paper; in practice it becomes habit.
+For one tool: what it is (one sentence) · why used, when not · output line by line · one safe lab example, test data only · your mistakes.
 
-Start by understanding in plain words. Read the concept file slowly, once, then write two sentences: what this topic is about, and how it works. If you can't write them, read again, slower, and don't move on yet. List the questions you still have, too — they tell you exactly what to test in the lab.
+Do that for one tool and the next gets easier — you already know how to learn a tool. Depth first, breadth later.
 
-Next, trace one example before you run anything: what goes in, what happens inside, what comes out, and what the output tells you about security. Guess what would change if you changed one input, and write the guess down before you test it. Guessing trains logic; skipping the guess trains nothing.
+## 4. Notes are proof, not decoration
 
-Then do it in your own lab — your Kali VM, or a legal lab platform, never a real system, even "just to see." Type the example yourself rather than copy-pasting blindly, run it with test data only, and save the output with the date and lab name. If it fails, don't skip to the next topic; debug it, because an error you walk past is a gap you'll meet again.
+- Help future you: in 3 months you'll forget details; good notes rebuild a lab in minutes, not days.
+- Prove your work: employers/interviewers trust written proof over "I watched a course".
 
-Then break it down. Change one small thing and run it again: a permission from 644 to 600, a different port, one different input. Note what changed, what stayed the same, and why. Change it back, change something else, repeat twice. This is where logical thinking grows: inputs, the parts the system trusts without checking, and the failure points where it breaks or where the lab design is weak.
+Copied text, no examples/output/mistakes = not notes. Good notes = your words, example, output, mistakes, questions.
 
-Then write notes in your own words, same shape every time so review stays fast: the concept as you'd say it, how it works, the lab example you actually ran with its output explained line by line, what you changed and what happened, why it matters for security, the mistakes you made, and the questions you still have. If any part is copied text, rewrite that part now.
+## 5. The method — the loop for every topic
 
-Then explain it in English for two to five minutes, recorded or to an imaginary friend: what you learned, how it works, what you did in the lab, what the output meant. Listen back. Anywhere you hear yourself saying "I don't know why," that part needs another pass through the understanding step. This isn't extra homework — communication is a red team job skill, and reports and interviews test it directly.
+```mermaid
+flowchart LR
+    A[1 · Understand] --> B[2 · Trace]
+    B --> C[3 · Do]
+    C --> D[4 · Break it down]
+    D --> E[5 · Write]
+    E --> F[6 · Explain]
+    F --> G[7 · Review tomorrow]
+    G -->|Can't do it| A
+```
 
-Finally, review the next day. Ten minutes: re-read yesterday's notes, then try the lab example again without looking at them first. If you can do it, the topic is done. If you can't, repeat the understand, do, and write parts today. That's not failure — it's the loop working, and the main defence against "I learned it last month but now I've forgotten it."
+| Step | Do this | Why it earns its place |
+|---|---|---|
+| 1 · Understand | Read slowly, once. Write 2 sentences: what it is, how it works. Can't? Reread, slower. List open questions — they set your lab tests | Stops empty memorising |
+| 2 · Trace | Before running: input, inside, output, security meaning. Guess one changed input's effect — write it first | Guessing trains logic |
+| 3 · Do | Own lab only (Kali VM/legal platform), never a real system. Type it yourself, no blind copy-paste, test data only. Save output + date + lab name. Fails? Debug — a skipped error returns | Doing creates real memory |
+| 4 · Break it down | Change one thing, rerun (permission 644 → 600, another port, another input). Note changed/unchanged/why. Revert, change another, repeat twice | Logical thinking: inputs, trusted parts, failure points |
+| 5 · Write | Same shape every time: concept as you'd say it, how it works, lab example + output line by line, changes + results, security meaning, mistakes, open questions. Copied? Rewrite it | Writing creates proof |
+| 6 · Explain | 2–5 minutes, English, recorded or to an imaginary friend: learned, how it works, lab done, output meaning. Listen back — "I don't know why" = redo step 1 | Communication skill — reports + interviews test it |
+| 7 · Review | Next day, 10 min: re-read notes, retry the lab blind. Can = done. Can't = repeat understand/do/write today | Review stops forgetting |
 
-Each part earns its place: understanding stops empty memorising, doing creates real memory, breaking it down creates logical thinking, writing creates proof, explaining creates communication skill, reviewing stops forgetting.
+## 6. When something fails in the lab
 
-## When something fails in the lab
+Failure is normal. Debug in order:
 
-Failure in the lab is normal. A professional doesn't panic; a professional debugs in order.
+1. **Read the full error, line by line** — file, line, command. Copy it exactly; don't paraphrase.
+2. **Check the basics:** right folder (`pwd`, `ls -l`)? file exists, or assumed? right command (`python3` vs `python`)? typed exactly, capitals included? Linux is case-sensitive — many "broken" labs are typos.
+3. **Make it smaller:** smallest working version; long script → one line at a time, head first, then terminal.
+4. **Docs for that one command/tool** — `--help`, `man`, official docs — before a random blog post.
+5. **One fix at a time,** noting each try + result. Five at once = never knowing which worked.
+6. **Still stuck? Ask specifically:** not "it's not working", but "this command, this folder, expected this, got this error, tried these two things — what next?"
+7. **Solved? Save error + fix.** Future you will meet it again; good notes save hours.
 
-Read the full error slowly, line by line — what file, what line, what command — and copy the exact error into your notes. Don't paraphrase errors; exact text matters when you're searching or asking for help. Check the basics first. Are you in the right folder? Run `pwd` and `ls -l`. Does the file actually exist, or did you assume it does? Are you using the right command name — `python3` versus `python`? Did you type the name exactly, capitals and all? Linux is case-sensitive, and a surprising number of "broken" labs are a typo.
+## 7. What a good lab write-up looks like
 
-Then make the problem smaller. Try the smallest version of the command that should work; if a long script fails, test one line at a time, in your head first, then in the terminal. Read the documentation for that one command or tool — `command --help`, `man command`, or the official docs — before a random blog post. Try one fix at a time and note each try and its result; try five at once and you'll never know which one worked. If you're still stuck, ask a specific question: not "it's not working, help," but "I ran this exact command in this exact folder, I expected this output, I got this exact error, and I already tried these two things — what should I check next?" Specific questions get specific, fast answers. Once it's solved, save the error and the fix in your notes. Future you will meet the same error again, and good notes save hours.
+Output is evidence, not a report. A write-up says:
 
-## What a good lab write-up looks like
+- Problem + why it matters: plain words, honest severity, no exaggeration.
+- Reproduction: exact lab steps.
+- Evidence: lab evidence, private details removed.
+- Fix idea: change a permission, close a port, check input, update software.
+- What you learned: in your own words.
 
-When a lab test turns up something, don't just save tool output. Output is evidence, not a report. A professional write-up says, in plain words, what the problem is and why it matters, with honest severity rather than exaggeration; the exact lab steps that reproduced it; the lab evidence with private details removed; the fix idea — change a permission, close a port, check input, update software; and what you learned, in your own words. That shape works for one finding or a whole engagement, and it's the shape interviewers recognise.
+That shape works for one finding or a whole engagement — and it's the shape interviewers recognise.
 
-## A daily structure that survives real life
+## 8. A daily structure that survives real life
 
-You don't need sixteen hours non-stop. You need a repeatable day, with breaks, movement, and review. Adapt the times to your life — college, work, and rest matter too.
+A repeatable day, with breaks, movement, review — adapt times to your life.
 
-A morning block of sixty to ninety minutes, when you're fresh, is best for a new topic: ten minutes reviewing yesterday's notes, forty to sixty minutes on understanding and doing, ten minutes writing notes. A midday or library block, thirty to sixty minutes if you have it, is for light work: read one write-up or documentation page, note one logical idea — inputs, trusted parts, failure points — and don't start a heavy lab here if you're tired. An evening block of sixty to ninety minutes is for lab practice and finishing today's notes, plus saving any report in your portfolio folder. Then ten to fifteen minutes of English: record your short explanation, listen once, note one sentence to improve tomorrow. Every fifty minutes, stand, walk, and stretch for five to ten minutes — movement is part of the design, not a break from learning.
+Morning 60–90 min (fresh): new topic — 10 min review, 40–60 min understand + do, 10 min write. Midday 30–60 min, if available: light work only. Evening 60–90 min: lab practice, finish notes, save reports. English 10–15 min: record, listen once, note one sentence to improve. Movement every 50 min: stand, walk, stretch 5–10 min.
 
-Across a week: one topic per weekday, one complete lab engagement on Saturday with a write-up, and Sunday for review. If you miss a day, don't try to do two days in one day next day — continue from where you stopped, with a ten-minute review first.
+**Week:** one topic per weekday · Saturday: one lab engagement + write-up · Sunday: review. Miss a day? Don't double up — continue where you stopped, after a 10-minute review.
 
-## How you know you're improving
+## 9. How you know you're improving
 
-Track weekly, in a simple file: topics completed with notes and lab proof, not just watched; write-ups finished; explanations recorded; commits made; questions answered and still open.
+**Track weekly:** topics done with notes + lab proof (not just watched) · write-ups · explanations · commits · questions answered + open.
 
-The real signs of improvement aren't feelings: you can do last week's lab again without notes, explain a topic to someone else in plain English, read a tool's output and explain each line, not just the last one, and find your own mistakes faster without panicking. Your notes are getting clearer and shorter — because you understand more, not because you're skipping details.
+Improving: last week's lab without notes · explaining a topic plainly · tool output line by line · own mistakes found faster, without panicking · notes clearer + shorter.
+Slow down signs: copying notes without understanding · can't explain yesterday's topic today · jumping to advanced tools to feel progress.
 
-The signs you need to slow down are normal too: copying notes without understanding, not being able to explain yesterday's topic today, jumping to advanced tools to feel progress. The fix is always the same: go back one phase, run the loop again on the weak topic, and don't add new topics until that one is solid.
+**Fix:** back one phase, rerun the loop on the weak topic, no new topics until it's solid.
 
-## How this repo itself is designed
+## 10. How this repo itself is designed
 
-This repo follows the same rules it teaches: structured so you can predict and review fast, detailed rather than shortcut, complex words explained in plain words when they first appear, every example lab only with test data, and each phase ending with proof you should save, not just a claim that you learned something. If a file here ever feels like a shortcut, that's a design bug — note it, and fix it with more explanation, more lab example, and more reasoning, not less.
+Same rules it teaches: structured for fast review · detailed, not shortcut · new words explained plainly at first use · every example lab only, test data · each phase ends with proof to save, not a claim. A file feeling like a shortcut = a design bug — fix with more explanation, lab example, reasoning.
 
-## Start here, today
+## 11. Start here, today — lab pass
 
-Read `01-roadmap/overview.md` fully, work through Phase 0, use the note shape above for your first topic, and record your first two-minute explanation. One topic, one lab, one note page, one explanation. Then repeat. That's the whole system — no shortcuts, no rush, one solid step at a time.
+Read `01-roadmap/overview.md` fully → work through Phase 0 → use the section 5 note shape for your first topic → record your first 2-minute explanation.
+
+One topic, one lab, one note page, one explanation. Then repeat — no shortcuts, no rush, one solid step at a time.
 
 ---
-
 *Educational use only. All practice must be on systems you own or have written permission to test.*
