@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Cybersecurity Red Team Roadmap - Beginner to Advanced">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a1128"/>
+      <stop offset="55%" stop-color="#0b1e3a"/>
+      <stop offset="100%" stop-color="#071021"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <!-- subtle circuit dots -->
+  <g fill="#22d3ee" opacity="0.18">
+    <circle cx="80" cy="80" r="3"/><circle cx="180" cy="140" r="3"/><circle cx="1020" cy="90" r="3"/><circle cx="1120" cy="180" r="3"/><circle cx="90" cy="520" r="3"/><circle cx="1110" cy="520" r="3"/>
+  </g>
+  <rect x="24" y="24" width="1152" height="582" rx="18" fill="none" stroke="#22d3ee" stroke-opacity="0.35" stroke-width="2"/>
+  <text x="600" y="110" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="800" fill="#67e8f9">Cybersecurity Red Team Roadmap</text>
+  <text x="600" y="160" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" fill="#e0f2fe">Beginner to Advanced</text>
+  <line x1="380" y1="185" x2="820" y2="185" stroke="url(#accent)" stroke-width="3"/>
+  <!-- Beginner -->
+  <g>
+    <rect x="60" y="215" width="340" height="330" rx="16" fill="#0f2a4a" stroke="#22d3ee" stroke-opacity="0.5"/>
+    <text x="230" y="265" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="800" fill="#67e8f9">BEGINNER</text>
+    <text x="230" y="315" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#ffffff">Recon</text>
+    <text x="230" y="350" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#ffffff">OSINT</text>
+    <text x="230" y="385" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#ffffff">Footprinting</text>
+    <text x="230" y="420" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#ffffff">Scanning</text>
+    <text x="230" y="475" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#bae6fd">Lab only  •  Learn the basics</text>
+  </g>
+  <!-- Intermediate -->
+  <g>
+    <rect x="430" y="215" width="340" height="330" rx="16" fill="#0f2a4a" stroke="#22d3ee" stroke-opacity="0.5"/>
+    <text x="600" y="265" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="800" fill="#67e8f9">INTERMEDIATE</text>
+    <text x="600" y="315" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#ffffff">Vulnerability Analysis</text>
+    <text x="600" y="350" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#ffffff">Exploitation</text>
+    <text x="600" y="385" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#ffffff">Credential Access</text>
+    <text x="600" y="420" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#ffffff">Lateral Movement</text>
+    <text x="600" y="475" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#bae6fd">Lab only  •  Build real skills</text>
+  </g>
+  <!-- Advanced -->
+  <g>
+    <rect x="800" y="215" width="340" height="330" rx="16" fill="#0f2a4a" stroke="#22d3ee" stroke-opacity="0.5"/>
+    <text x="970" y="265" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="800" fill="#67e8f9">ADVANCED</text>
+    <text x="970" y="315" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#ffffff">Persistence</text>
+    <text x="970" y="350" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#ffffff">Evasion</text>
+    <text x="970" y="385" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#ffffff">Post-Exploitation</text>
+    <text x="970" y="420" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#ffffff">Reporting</text>
+    <text x="970" y="475" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#bae6fd">Lab only  •  Prove your work</text>
+  </g>
+  <text x="600" y="580" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#94a3b8">Learn  •  Lab  •  Break  •  Notes  •  Explain  •  Review</text>
+</svg>

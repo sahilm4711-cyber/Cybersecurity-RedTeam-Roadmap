@@ -1,3 +1,5 @@
+![Cybersecurity Red Team Roadmap Banner](assets/banner.svg)
+
 # Cybersecurity Red Team Roadmap
 
 ## A specific, simple roadmap to become a Red Team professional — beginner to advanced
