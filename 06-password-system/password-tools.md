@@ -1,70 +1,106 @@
-# Password Tools
+# Password Tools — Visual Notes
 
-You know Linux, networks, and the web. Now password tools — not to break other people's passwords, but to understand what makes a password strong, how a good system stores it, and how to check your own test passwords safely.
+Lab only · test passwords only · never a real password, hash, or username in a note
 
-If you can explain length, character types, entropy in plain terms, hashing, and salting, and you can check a test password without ever using a real one, you understand this topic. If you only know a tool name, you don't.
+Password tools are not for breaking other people's passwords. They teach what makes a password strong, how a good system stores it, and how to check your own test passwords safely.
 
-Safety first, and it is non-negotiable: use test passwords only — invent a test word for lab, never a real password you use anywhere else. Never test, check, crack, or try to guess a real person's password, a real account, or a password file you don't own. Never put a real password, a real hash from a real system, or a real username in a note, screenshot, or public file. Use placeholders: `<test-password>`, `test-user`, `your-user`.
+## 1. What a password system has to get right
 
-## What a password actually is
+A password is one factor: something you know. Something you have (phone, key) and something you are (fingerprint) are later topics.
 
-A password is a secret you know, that a system checks to confirm you are who you claim to be. It is one factor of authentication: something you know. The other factors — something you have, like a phone or a key, and something you are, like a fingerprint — are later topics, not this file.
+| Part | Job | A flaw here means |
+|---|---|---|
+| Creation | How a user chooses a password, checked for weakness? | Weak passwords get in |
+| Storage | Plain text — never — or a hash? (see §4) | Every password leaks at once |
+| Checking | Compare typed vs stored, without leaking which part was wrong, without unlimited guesses | Guessing runs free |
 
-A password system has three parts, and a flaw in any one of them breaks the whole thing: creation (how does a user choose a password, and is it checked for weakness?), storage (plain text — never — or a hash, covered below?), and checking (how does the server compare what you typed with what it stored, without leaking which part was wrong, and without allowing unlimited guesses?). A red-team learner, later, checks all three parts in a lab app they built themselves — not in a real app.
+Check all three later, in a lab app you built yourself — not a real app.
 
-## What makes a password strong
+## 2. What makes a password strong — in order
 
-In order of importance:
+| Factor | Why it matters | In short |
+|---|---|---|
+| **1. Length — matters most** | Each extra character adds another wheel to the combination lock, multiplying the combinations | A 16-character phrase of four random words beats a short password with symbols |
+| **2. Unpredictability** | Guessing starts with common lists, not random tries | Random or unrelated words beat a common word, name, date, or pattern |
+| **3. Character types** | Upper, lower, digits, symbols increase the guessing space | Helps a little vs length — a short password with symbols is still short |
 
-**Length matters most.** A longer password takes much longer to guess, even if it is simple words. A 16-character password made of four random words is, in plain terms, much stronger than an 8-character password with symbols, because the guessing space grows with every character. Think of it like a combination lock: each extra character adds another wheel, and each wheel multiplies the number of combinations. That is why length grows strength so fast, and why a short password, no matter how clever, is still a small lock.
+Short + common = weak. Short + symbols = still weak. Long, unrelated words + number + symbol = stronger — length and unpredictability, not the symbol alone.
 
-**Unpredictability matters next.** A password that is a common word, a name, a date, or a pattern like `123456` is easy to guess, because guessing in a lab starts with common lists first. A password that is random, or made of unrelated words you chose, is harder to guess.
+Habits that matter as much as strength:
 
-**Character types help, but they don't fix a short password.** Upper case, lower case, numbers, and symbols increase the guessing space, but only a little compared to adding length. A short password with symbols is still short.
+- Don't reuse across sites — one leak then opens every site using it.
+- Don't use a name, pet name, birthday, or common word with a number at the end — exactly what a lab checker should reject.
+- Don't share a password in a note, screenshot, or chat, even a test one that looks real. In notes, write `<test-password>`.
 
-And a few habits that matter as much as strength: don't reuse the same password across sites — if one site leaks it, every site using it is at risk. Don't use a password that is your name, a pet name, a birthday, or a common word with a number at the end — that kind of weak choice is exactly what a lab checker should reject. And don't share a password in a note, screenshot, or chat, even a test one that looks real. Use `<test-password>` in notes.
+## 3. Your checker — the simplest password tool
 
-You already built a simple password checker in your first project, with length and has-number checks. That checker is a password tool in its simplest form. Extend it in lab the same small-step way: take a test password only, measure its length (under 12 is too short for a real password, in lab terms), check for lower case, upper case, digit, and symbol, count how many of those four types are present, and give a simple verdict — weak, medium, or strong — based on length first, then types. Don't save the test password, don't send it anywhere, and don't use it as a real password.
+You already built a simple checker in your first project, with length and has-number checks. Extend it in lab the same small-step way, test passwords only:
 
-What the output means, with test examples only: an 8-character test word with a number, no upper case, and no symbol. A simple checker might call it medium; in real-life terms it is weak, because it is short and it is a common word plus a common number. A longer test phrase made of four unrelated words, with a number and a symbol, would be stronger — because of length and unpredictability, not because of the symbol alone.
+1. Take a test password only — write `<test-password>` in any note, never the value itself.
+2. Measure length: under 12 is too short for a real password, in lab terms.
+3. Check lower, upper, digit, symbol. Count how many of the four types are present.
+4. Verdict — weak, medium, or strong — length first, then types.
+5. Don't save it, don't send it anywhere, don't use it as a real password.
 
-Watch out for two misreadings: a checker saying "strong" does not mean the password is safe to reuse everywhere — strength is only one part, and reuse, storage, and guessing limits matter too. And never check a real password in an online checker or a public tool. That sends your secret to someone else. Check test passwords only, on your own machine only.
+**Watch out:** "strong" does not mean safe to reuse everywhere — reuse, storage, and guessing limits matter too. Never check a real password in an online checker — that sends your secret to someone else. Test passwords only, on your own machine only.
 
-## Why common passwords fail
+## 4. Why common passwords fail — and what a good design does
 
-Guessing does not start randomly. It starts, in order, with common passwords, dictionary words, names, dates, and patterns, then combinations of those. That is why a common password fails fast, even if it looks clever to a human.
+Guessing does not start randomly. It starts, in order: common passwords, dictionary words, names, dates, patterns, then combinations of those.
 
-That matters for defence, not attack. If you understand that guessing starts with common lists, you understand why a system must require longer passwords, reject common passwords, limit guessing tries, and lock or slow down after repeated failures. Those are design rules.
+That matters for defence, not attack: a system must require longer passwords, reject common passwords, limit tries, and lock or slow down after repeated failures.
 
-For a lab app you built yourself, with test accounts only, that means three design rules: reject test passwords that are in a small common list you write yourself in lab (for example `password` and `123456` as examples of weak test words to reject), require a minimum length of 12 characters or more for a real password, and limit login tries while showing the same short error for any failure — "Username or password is incorrect." Don't say which part was wrong.
+For a lab app you built yourself, test accounts only:
 
-This file deliberately gives no list of real passwords to try, no method to guess a real account, and no tool to use against a real system. Those are not learning tasks. The learning task is understanding why common passwords fail, and designing a lab system that rejects them and limits tries. And remember: a password can be uncommon and still be short, predictable, or reused. Length, unpredictability, and not reusing matter together.
+| Design rule | In your lab app |
+|---|---|
+| Reject common passwords | Reject test passwords in a small common list you write in lab |
+| Require length | Minimum 12 characters or more for a real password |
+| Limit tries | Limit tries, slow failures, log safely with no secrets in the log |
+| Same error, always | "Username or password is incorrect." — never say which part was wrong |
 
-## Hashing and salting: how a good system stores passwords
+Uncommon is not enough — a password can still be short, predictable, or reused. Length, unpredictability, and not reusing matter together.
 
-A good system never stores a password in plain text. If it did, anyone who reads the storage file would read every password. Instead, it stores a hash.
+This file deliberately gives no list of real passwords to try, no method to guess a real account, and no tool to use against a real system. The learning task is designing a lab system that rejects common passwords and limits tries.
 
-A **hash** is a one-way fingerprint of a password. You can turn a password into a hash, but you cannot turn a hash back into the password, by design. When you log in, the system hashes what you typed and compares the two hashes. If they match, the password was correct. The system never needs to store the password itself.
+## 5. Hashing and salting — how a good system stores passwords
 
-A **salt** is a random value, different for each user, added before hashing. Salt means two users with the same password will have different hashes, and a pre-made list of hashes for common passwords won't work directly, because each hash is salted differently.
+A good system never stores a password in plain text — anyone reading the storage file would read every password. Instead, it stores a hash.
 
-**Slow hashing for passwords** is a hashing method designed for passwords, deliberately slow, so guessing many passwords takes a long time. Fast hashes, designed for files, are wrong for passwords, because they let guessing go fast. In lab terms, remember: password hashing must be slow, salted, and one-way. The exact method name is a later, deeper topic — don't implement your own password storage from this file alone, and never store a real password in a lab file to "test" hashing.
+```mermaid
+flowchart TD
+    A[User creates a password<br/>lab, test data only] --> B[Random salt generated<br/>different for each user]
+    B --> C[Hash password + salt<br/>with a slow password-hashing method]
+    C --> D[Store only salt + hash<br/>never the password]
+    E[User logs in, types a password] --> F[Hash with the stored salt<br/>same method, timing-safe compare]
+    F -->|Hashes match| G[Login succeeds]
+    F -->|No match| H[Same short error<br/>count it for rate limiting]
+```
 
-The design, in outline: a user creates a password in lab, with test data only. The server generates a random salt, different for that user, hashes password plus salt with a slow password-hashing method, and stores only salt plus hash — never the password itself. Later, the user types a password, the server hashes it with the stored salt using the same method, and compares the two hashes in a way that doesn't leak timing. If they match, login succeeds. If not, the server shows the same short error and counts the failure for rate limiting.
+| Term | Means | Why |
+|---|---|---|
+| Hash | A one-way fingerprint — password → hash works, hash → password does not, by design | The system never needs to store the password itself |
+| Salt | A random value, different for each user, added before hashing | Two users with the same password get different hashes; pre-made hash lists won't work directly |
+| Slow hashing | A hashing method designed for passwords, deliberately slow | Guessing takes a long time; fast hashes, designed for files, let guessing go fast |
 
-If a lab app you built stores passwords in plain text, or in a file you might share, that is a design flaw to fix immediately, in lab, before you build anything else on top of it. Change the design to hash plus salt, or remove passwords from that lab app entirely and use test accounts with no real data. A lab habit becomes a real habit, so "it's only a lab" is not a reason to store plain text. And don't put a hash from a real system in a public note thinking it is safe because it is "only a hash" — a hash of a weak password can be guessed in lab by trying common words. Never publish a real hash.
+Password hashing must be slow, salted, and one-way. The exact method name is a later topic — don't implement your own password storage from this file alone, and never store a real password in a lab file to "test" hashing.
 
-## Password managers and multi-factor
+**Watch out:** if a lab app stores plain text, fix it in lab now — hash plus salt, or remove passwords from that app. "It's only a lab" is no excuse; a lab habit becomes a real habit. Don't publish a real hash as "only a hash" — a weak password's hash can be guessed from common words.
 
-A **password manager** creates long, random passwords for each site, stores them encrypted with one strong master password, and fills them in for you. It solves the reuse problem, because you no longer need to remember many passwords — only one strong master password, protected properly.
+## 6. Password managers and multi-factor
 
-**Multi-factor authentication (MFA)** requires two or more different factors to log in — for example, something you know (password) plus something you have (a code from an app, or a security key). Even if a password leaks, an attacker would still need the second factor.
+| Tool | Solves | Doesn't solve |
+|---|---|---|
+| Password manager | Long, random passwords per site, stored encrypted with one strong master password, filled in | MFA — it helps with passwords, not a second factor |
+| Multi-factor (MFA) | Two or more factors — e.g. password (know) + code from an app or security key (have) | Protection on other sites — MFA on one site doesn't protect another |
 
-This part is not a lab task — it is a real-life habit that protects your real accounts, including the GitHub account you use for this roadmap. Use a password manager for real accounts, use long, random passwords per site, and turn on MFA where a site offers it, especially for email and GitHub. Each site needs its own password, and MFA where offered — MFA on one site does not protect another. Never share a master password or an MFA code in a note, screenshot, or chat. A code is a secret, for one use, for a short time. And a manager doesn't replace MFA: a manager helps with passwords, MFA adds a second, different factor.
+Even if a password leaks, MFA means an attacker still needs the second factor. Not a lab task — a real-life habit for real accounts, including GitHub: a password manager, long random passwords per site, MFA where offered, especially email and GitHub. Never share a master password or an MFA code — a code is a secret, for one use, for a short time.
 
-One more thread that ties this file together: a system that allows unlimited guesses, even with strong passwords, is a design flaw. Limit tries, slow down failures, and log failures safely, without secrets in the log. Strength, reuse, storage, and guessing limits are separate design rules, and a good system gets all of them right.
+## 7. Lab pass — try it now
 
-Next: `system-tools.md`, then `safe-labs.md` — how password safety and system safety fit together in a lab.
+Extend your checker (§3) in lab, test passwords only. Print length, types present, and verdict — length first, then types. In your note, write only: length band, types present, verdict, and `<test-password>`, never the value.
+
+Next → `system-tools.md`, then `safe-labs.md`
 
 ---
-*All examples here are for your own machine or your own private lab only, with test data only. Never publish a real password, real hash, real username, or real personal data in a note or public file.*
+*Lab only: systems you own or have written permission to test, test data only. Never publish a real password, real hash, real username, or real personal data.*
