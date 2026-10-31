@@ -1,63 +1,94 @@
-# Tools Overview
+# Tools Overview — Visual Notes
 
-You already know computers, Linux, networks, and the web. Now you meet the tools — not as a list to memorise, but as a way of asking better questions.
+Lab only · own machine / own private lab · test data only
 
-A working red-teamer does not start with a tool. They start with a question, then pick the smallest tool that answers it. If you can say, for any tool, what question it answers, what you feed it, what it spits out, and what that output does *not* prove, you understand it. If you only know its name, you don't.
+## 1. Question first, tool second
 
-Every example here is for your own machine or your own private lab only. A tool never gives you permission. Permission comes from the owner, in writing, before you start. In learning, your own lab is your scope. Use test data only, and generic placeholders only: `your-user`, `<your-lab-ip>`, `<test-password>`, `<lab-port>`, `<lab-domain>`.
+```mermaid
+flowchart LR
+    Q[Question<br/>one sentence] --> S[Smallest tool<br/>that answers it]
+    S --> R[Run once<br/>lab input only]
+    R --> N[Read line by line<br/>write a tool note]
+    N --> NQ[Next question<br/>or stop]
+```
 
-## A tool is an answer to a question
-
-Every tool follows the same shape: question, input, action, output, meaning, next question. Get in the habit of writing the question down in one sentence before you run anything.
+A tester knows, for each tool: question, input, output, meaning, limit, next check. A tool-runner only knows its name.
 
 ```text
 Question: What is listening on my own machine?
-Tool: ss
-Command: ss -tln
-Meaning: LISTEN means a service is waiting. 127.0.0.1 means
-  localhost only. 0.0.0.0 means it is exposed to the network.
-Limit: this tells you about your own machine, nothing about a remote host.
+Tool: ss — Command: ss -tln
+Meaning: LISTEN = a service is waiting.
+  127.0.0.1 = localhost only. 0.0.0.0 = exposed to the network.
+Limit: this says nothing about a remote host.
 ```
 
-That short note is worth more than a page of pasted output. If you cannot write one after running a tool, you have only run it — you haven't learned it.
+## 2. The five families
 
-Watch out for the most common beginner trap: reaching for the biggest, most famous tool first. It floods you with output, teaches you nothing, and on a real system it would be unauthorised testing. Start small, start with a question, run once, read line by line.
+| Family | Question it answers | Start with |
+|---|---|---|
+| System + network checks | What is on my machine, what is listening, what is my network? | `ip`, `ss`, `ping`, `dig`, `curl`, `ps`, `ls` |
+| Recon, lab only | What is known about a lab target I own? | DNS tools, WHOIS idea, lab listing |
+| Scanning, lab only | Which ports are open on a lab host I own? | Port scanner, one lab VM, slowly |
+| Web tools, lab only | How does this lab site work, and where is the design weak? | Dev tools, `curl`, lab proxy, lab scanner |
+| Password, system, reporting | Is this lab password weak? Is this lab system safe? | Test-password checkers, own-machine audits |
 
-## The five families
+Use the first family first, every time — local, mostly read-only, settles half your questions.
 
-**System and network checks.** These answer: what is on my own machine, what is listening, what is my network? You already know them: `ip`, `ss`, `ping`, `dig`, `curl`, `ps`, `ls`. Use them first, every time. They are local, mostly read-only, and they settle half your questions before you need anything fancier.
+```mermaid
+flowchart TD
+    A[Need it already?] -->|Yes| Z[ip / ss / ping / dig / curl]
+    A -->|Lab names or services?| B[Recon, lab only]
+    A -->|Lab web check?| C[Web tools, lab app only]
+    A -->|Password or system check?| D[Password / system tools]
+```
 
-**Recon — information gathering, lab only.** What is known about a lab target I own? Names, addresses, services in my lab. DNS tools, the WHOIS idea, subdomain and service listing in lab — detail is in `recon-tools.md`. Recon on a real domain, company, or person without permission is not learning. It is probing, and it shows up in logs.
+**Watch out:** biggest tool first = floods of output, nothing learned, and on a real system, unauthorised testing.
 
-**Scanning — what is open, lab only.** Which ports are open on a lab host I own, and which services sit behind them? A port scanner in lab, against one VM you own, run slowly, after you have written down why. Never scan a host you don't own. A scan is noisy, it is logged, and it is a clear sign of testing.
+## 3. Learning a new tool, properly
+1. Read its own help: `tool --help` or `man tool`, on your own machine.
+2. Write its question in one sentence.
+3. Find one safe, lab-only example in this roadmap or the tool's docs.
+4. Run it once, on your own machine or lab VM.
+5. Read the output line by line. Mark three lines you understand, one you don't — look up only that one. Run it again and explain it without looking.
+6. Finish with a tool note: name, question, command, meaning, limits, one pitfall.
 
-**Web tools — checking a lab website.** How does this lab site work? What requests does it make, what does it return, where is the design weak? Browser developer tools, `curl`, a web proxy in lab, a web scanner in lab — detail is in `web-tools.md`. Only against a site you built yourself, or a deliberately vulnerable lab app on your own machine. Never against a real site.
+## 4. Output: what it proves, and what it doesn't
 
-**Password, system, and reporting tools.** Is this lab password weak? Is this lab system configured safely? How do I write a report that is actually useful? Password checkers with test passwords only, system audits on your own machine only, and report templates. Those get their own files later in this phase.
+| Output | Proves | Does not prove |
+|---|---|---|
+| `ping` reply | ICMP came back from that lab host | A web service runs, or a port is open |
+| `ss -tln` LISTEN | A service listens on your machine, on that port | Anything about a remote host |
+| `dig` answer | DNS gave that answer, at that time | The site is up, or secure |
+| `curl -i` 200 | That lab service returned 200 for that one request | The whole site is secure |
+| Open port in a scan | That lab port responded, in that scan | The service is vulnerable — or safe |
+| Scanner finding | The lab app behaved a certain way, in that test | A real app has the same flaw, or it is exploitable |
 
-A professional does not collect tools. They collect questions, and they know which tool answers which question, and where that tool stops being useful.
+Never write "Tool X found Y, therefore hacked." Write: "Tool X, with this lab input, gave this output, which means this, not that, and the next check is this."
 
-## Learning a new tool, properly
+## 5. Before every run
 
-Read the tool's own help first — `tool --help`, or `man tool`, on your own machine. Write down, in one sentence, what question it answers. Find one safe, lab-only example in this roadmap or in the tool's own docs. Run that one example, once, on your own machine or lab VM.
+1. Target = my own machine or my own private lab, only?
+2. Question written down, in one sentence? Smallest tool that answers it?
+3. Input = lab IP, lab domain, lab file, or lab URL only?
+4. Test data only — no real password, token, or personal data?
+5. Will I read the output line by line, write a note with placeholders only, and stop lab services when done?
 
-Then read the output line by line. Mark three lines you understand and one you don't, and look up only the one you don't. Run it again and explain the output in your own words, without looking. Finish with a short note: tool name, question, command, what the output means, its limits, and one pitfall to avoid. Don't move on to a new target until that note exists. It takes five minutes and it is the difference between someone who has run a tool and someone who can use it.
+Any no → fix it first. A tool never gives permission — that comes from the owner, in writing, before you start. In learning, your own lab is your scope.
 
-## Output: what it proves, and what it doesn't
+**Watch out:** never copy full output with real IPs, hostnames, or secrets into a public note — summarise with placeholders (`your-user`, `<your-lab-ip>`, `<test-password>`). Never trust one tool alone. Never sweep or flood just because a tool allows it: one host, one check, slowly.
 
-This is the skill that separates a tester from a tool-runner. Every output has limits, and a good report states them plainly.
+## 6. Lab pass — try it now
 
-A `ping` reply proves ICMP came back from that lab host. It does not prove a web service is running or a port is open. `ss -tln` showing LISTEN proves a service is listening on your own machine, on that port. It says nothing about a remote host. A `dig` answer proves DNS gave that answer, at that time. It does not prove a site is up or secure. `curl -i` returning 200 proves that lab service returned 200 for that one request. It does not prove the whole site is secure. An open port in a scan proves that lab port responded, in that scan. It does not prove the service is vulnerable — or safe. A scanner finding proves the lab app behaved in a certain way, in that test. It does not prove a real app has the same flaw, or that the finding is exploitable.
+```bash
+ss -tln        # what is listening on your own machine?
+ip a           # what is my network, on my own machine?
+```
 
-So never write "Tool X found Y, therefore the system is hacked." Write: "Tool X, with this lab input, gave this output, which means this, and does not mean that, and the next check needed is this." That sentence structure is the whole of red-team reporting, in miniature.
+For each port, write one tool note: question, command, meaning (localhost-only or exposed?), limit, next question.
 
-## Before every run
+**Done when you can:** state any tool's question, input, output, meaning, limit, and next check — without looking.
 
-Run this through your head before you press Enter. Is the target my own machine or my own private lab, only? Do I have the question written down? Is this the smallest tool that answers it? Is the input a lab IP, lab domain, lab file, or lab URL only? Am I using test data only, with no real password, token, or personal data? Will I read the output line by line and write a note with placeholders only? Will I stop lab services and close the tool when I'm done? If any answer is no, fix it first. That habit, repeated, is what separates a learner in a lab from someone who causes harm by accident.
-
-A few more things I have learned the hard way: never copy a full tool output with real IPs, hostnames, or secrets into a public note or screenshot — summarise with placeholders. Never trust one tool alone — cross-check with a second, smaller tool and with your own understanding of the system. And never run a sweep or flood in lab just because a tool allows it. Allowed by the tool is not the same as needed for learning. One host, one check, slowly.
-
-Next: `recon-tools.md`, then `web-tools.md`. For each new tool there, write a tool note before you run anything.
+Next → `recon-tools.md`, then `web-tools.md`
 
 ---
-*All examples here are for your own machine or your own private lab only. Use test data only. Never publish a real username, hostname, password, token, or real IP in a note or public file.*
+*Lab only: systems you own or have written permission to test, test data only.*

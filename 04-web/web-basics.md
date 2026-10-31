@@ -1,36 +1,67 @@
-# Web: Web Basics
+# Web Basics — Visual Notes
 
-You've got computers, Linux, and networks. Now the web, which rides on top of all three. Most red-team work, and most real systems you'll one day defend or test with permission, are web systems. So this map matters: if you can read a URL piece by piece, read an HTTP request and response, and explain cookies and sessions, you have what the OWASP file builds on. Without it, web tools are just noise.
+Lab only · own machine · own private lab · `http://127.0.0.1:8000` and `example.com` as examples
 
-Same rule as the networks files: your own machine, your own private lab. Use `http://127.0.0.1:8000` and `example.com` as examples, never a real site you don't own. Never a real username, password, or session value in an example — placeholders like `your-user` and `<test-password>` only. A lab server on your own machine is for learning how the web works, not a tool against anyone else.
+## 1. The picture
 
-## The picture
+| Part | Job |
+|---|---|
+| **Browser** | Customer — asks, shows the answer, remembers small notes |
+| **Server** | Kitchen — program on a computer, listening on a port, prepares the answer |
+| **Website** | Menu + kitchen rules — what you can order, what's checked before cooking |
+| **Network** | Road between customer and kitchen — IPs, ports, DNS, packets |
+| **HTTP** | Language of the order |
 
-Think of the web as a restaurant. The browser is the customer — it asks for things, shows the answer, remembers small notes for you. The server is the kitchen — a program on a computer, listening on a port, that receives the order, prepares the answer, and sends it back. The website is the menu plus the kitchen rules: what you can order, what's checked before cooking, what's sent back. The network is the road between customer and kitchen — IPs, ports, DNS, packets, everything from Phase 2. HTTP is the language of the order.
+Every web security question starts with four asks: who is asking? What exactly are they asking for? What does the server check before it answers? What does it send back, to whom?
 
-Every web security question starts with four questions about that picture: who is asking, what exactly are they asking for, what does the server check before it answers, and what does it send back, to whom? If you can't answer those for a lab page, you can't test it or explain it.
-
-## Reading a URL
-
-A URL is an address for one thing on the web. Read it left to right:
+## 2. Reading a URL
 
 ```
 https://example.com:443/shop/item?id=42#details
 ```
 
-Scheme first — `https` — which rules to use. Then host — `example.com` — which server, by name; your machine turns that name into an IP with DNS. Then port, if one is shown after a colon — 443 here, the usual HTTPS door, often hidden because it's the default. Then path — `/shop/item` — which thing on that server. Then query — `?id=42` — extra details, pairs of `name=value` joined by `&`, like `?id=42&sort=price`. Then fragment — `#details` — which part of the page to jump to, handled by the browser only and never sent to the server.
+| Part | Example | Means |
+|---|---|---|
+| Scheme | `https` | Which rules to use |
+| Host | `example.com` | Which server, by name — DNS turns it into an IP |
+| Port | `:443` | Which door — often hidden when it's the default |
+| Path | `/shop/item` | Which thing on that server |
+| Query | `?id=42` | Extra details — `name=value` pairs joined by `&`, e.g. `?id=42&sort=price` |
+| Fragment | `#details` | Which part of the page to jump to — browser only, never sent to the server |
 
-Read this one out loud: `http://127.0.0.1:8000/notes?page=2`. Scheme `http`, host `127.0.0.1` — this computer only, your lab — port 8000, path `/notes`, query `page=2`. "On this computer, door 8000, show me notes, page 2."
+Read it out loud: `http://127.0.0.1:8000/notes?page=2` = "On this computer, door 8000, show me notes, page 2."
 
-Two things beginners get wrong here. The fragment is not sent to the server, so nothing on the server can act on it. And query strings are a bad place for secrets — they end up in browser history and server logs, so never put a password or token in a URL. A placeholder in an example is fine; a real value is not.
+**Watch out:** query strings end up in browser history and server logs — never put a password or token in a URL.
 
-## HTTP: request, then response
+## 3. HTTP — request, then response
 
-Every web action is one round trip: a request, then a response.
+```mermaid
+flowchart LR
+    B[Browser<br/>builds request] --> N[Network<br/>DNS → IP → port → TLS if HTTPS]
+    N --> S[Server<br/>checks session + permissions,<br/>does the work]
+    S --> R[Response<br/>status + headers + body]
+    R --> B2[Browser<br/>reads status first,<br/>then headers, then body]
+    B2 -->|Redirect| B
+```
 
-A request has four parts. Method — what kind of action: GET means "show me this" and should not change anything on the server; POST means "take this data and do something with it," used for forms, logins, and creating things; PUT replaces a thing, PATCH changes part of one, DELETE removes one, HEAD is GET but headers only, OPTIONS asks what a thing allows. Path — the thing being asked about, from the URL. Headers — extra notes about the ask. Body — the data itself, mainly for POST, PUT, and PATCH; a GET normally has no body.
+| Request part | Means |
+|---|---|
+| Method | What kind of action |
+| Path | Thing being asked about, from the URL |
+| Headers | Extra notes about the ask |
+| Body | Data itself — mainly POST / PUT / PATCH; a GET normally has no body |
 
-A simple GET, written out:
+| Method | Means |
+|---|---|
+| GET | Show me this — should not change anything on the server |
+| POST | Take this data and do something — forms, logins, creating things |
+| PUT | Replace a thing |
+| PATCH | Change part of a thing |
+| DELETE | Remove a thing |
+| HEAD | GET, headers only |
+| OPTIONS | Ask what a thing allows |
+
+A GET, written out:
 
 ```
 GET /notes?page=2 HTTP/1.1
@@ -39,9 +70,7 @@ User-Agent: example-browser
 Accept: text/html
 ```
 
-"Using HTTP 1.1, show me /notes, page 2, on example.com. I'm a browser, and I accept HTML."
-
-A response has four parts too: status line, headers, a blank line, body.
+A response, written out:
 
 ```
 HTTP/1.1 200 OK
@@ -51,130 +80,162 @@ Content-Length: 48
 <html><body><h1>Notes, page 2</h1></body></html>
 ```
 
-Don't memorise every status code. Learn the groups, then the common ones. 2xx means success — 200 OK, 201 Created, 204 No Content. 3xx means redirect, "not here, go there" — 301 moved permanently, 302 moved for now, 304 not modified, use your cached copy. 4xx means the ask was wrong somehow — 400 bad request, 401 unauthorised, 403 forbidden, 404 not found, 429 too many requests, slow down. 5xx means the server failed while trying — 500 internal error, 502 bad gateway, 503 unavailable for now.
+| Response part | Means |
+|---|---|
+| Status line | Protocol + status code + reason |
+| Headers | Notes about the answer |
+| Blank line | Headers end here |
+| Body | Actual content |
 
-The 401 versus 403 distinction is a classic lab and interview question, and it's worth getting clean: 401 means "who are you? Log in first." The name is confusing — it really means not authenticated yet. 403 means "I know who you are. Still no." One is about identity, the other about permission.
+## 4. Status codes — learn the groups, then the common ones
 
-Follow one request end to end and the rest of the web gets easier: the browser builds the request; DNS turns the host into an IP, unless it's already `127.0.0.1`; the browser connects on the right port — 80, 443, or the lab port like 8000; it sends the request; the server checks who you are and what you're allowed to do, does the work, and builds a response; the browser reads the status first, then headers, then body; and if the status is a redirect, the browser follows the new location and the steps repeat.
+| Group | Means | Common codes |
+|---|---|---|
+| 2xx | Success | 200 OK · 201 Created · 204 No Content |
+| 3xx | Redirect — "not here, go there" | 301 moved permanently · 302 moved for now · 304 not modified, use cached copy |
+| 4xx | Ask was wrong somehow | 400 bad request · 401 unauthorised · 403 forbidden · 404 not found · 429 too many requests |
+| 5xx | Server failed while trying | 500 internal error · 502 bad gateway · 503 unavailable for now |
 
-## Headers: notes on the envelope
+| Code | Means — don't mix these up |
+|---|---|
+| **401** | "Who are you? Log in first." — not authenticated yet (name is confusing) |
+| **403** | "I know who you are. Still no." — authenticated, not permitted |
 
-Headers are `Name: value` lines. They're not the data; they're notes about the data, the asker, and the rules. The ones you'll meet first:
+## 5. Headers — notes on the envelope
 
-Host, which server name the ask is for — needed because one server can host many names. User-Agent, which browser or tool is asking — servers adapt pages to it, but never trust it as identity. Accept, what kind of answer the asker can handle: HTML, JSON, image. Content-Type, what kind of data is in the body — `text/html` for a page, `application/json` for JSON, `application/x-www-form-urlencoded` for a simple form. Content-Length, the body size in bytes. Cookie and Set-Cookie, the memory mechanism in the next section. Authorization, proof of who you are, like a token — lab placeholders only, never a real token. Location, where to go next on a redirect. Cache-Control, rules about saving a copy and reusing it.
+Headers are `Name: value` lines — notes about the data, the asker, and the rules. Not the data itself.
 
-Headers are easy to read and easy to change, and that's the lesson: a server must never trust a header as proof by itself. User-Agent can say anything, cookie values can be copied. Trust comes from a checked session on the server, not from a header that arrived in the ask. Content-Type is only a label the sender wrote, so the server still has to check the data itself. Headers aren't secret — anyone who can see the request can see them.
+| Header | Means |
+|---|---|
+| Host | Which server name the ask is for — one server can host many names |
+| User-Agent | Which browser or tool is asking — never trust it as identity |
+| Accept | What kind of answer the asker can handle — HTML, JSON, image |
+| Content-Type | What kind of data is in the body — `text/html`, `application/json`, form-encoded |
+| Content-Length | Body size in bytes |
+| Cookie / Set-Cookie | Memory mechanism — see §6 |
+| Authorization | Proof of who you are, e.g. a token — lab placeholders only |
+| Location | Where to go next on a redirect |
+| Cache-Control | Rules about saving a copy and reusing it |
 
-## Cookies and sessions: how the web remembers you
+Lesson: never trust a header as proof by itself. User-Agent can say anything, cookie values can be copied. Trust comes from a checked session on the server. Content-Type is only a label the sender wrote — the server still checks the data itself.
 
-HTTP on its own has no memory. Every request is a new stranger. Cookies and sessions are how a web app remembers you between requests, and this is one of the most important ideas in web security.
+## 6. Cookies and sessions — how the web remembers you
 
-A cookie is a small piece of text the server asks your browser to store, which the browser then sends back with later asks to the same site. Coat-check ticket: the shop gives you a ticket, you keep it, you show it each time you come back so the shop knows which coat is yours.
+HTTP alone has no memory. Every request is a new stranger. Cookies + sessions fix that.
 
-The server sets one with a `Set-Cookie` header:
+```mermaid
+flowchart TD
+    A[Server sets cookie] --> B[Browser stores it]
+    B --> C[Browser sends it back<br/>with later asks to same site]
+    C --> D[Server looks up session ID<br/>in its own memory]
+    D -->|Live session found| E[Knows who you are<br/>+ what you may do]
+    D -->|Nothing / expired| F[Logged out]
+```
+
+Coat-check ticket: shop gives you a ticket, you show it each time, shop knows which coat is yours.
 
 ```
 Set-Cookie: session_id=<example-session-value>; Path=/; HttpOnly
-```
-
-The browser sends it back:
-
-```
 Cookie: session_id=<example-session-value>
 ```
 
-Four cookie rules to know in plain words. HttpOnly means JavaScript in the page cannot read the cookie — a safety rule, so a script problem in the page can't easily steal it. Secure means send it only over HTTPS, never plain HTTP. SameSite limits when the browser sends it with asks coming from another site, which helps stop other sites from riding your logged-in state. Path and Expires or Max-Age say where it applies and how long the browser keeps it.
+| Cookie rule | Means |
+|---|---|
+| HttpOnly | JavaScript in the page cannot read the cookie |
+| Secure | Send only over HTTPS, never plain HTTP |
+| SameSite | Limits sends with asks from another site — stops other sites riding your logged-in state |
+| Path / Expires / Max-Age | Where it applies, and how long the browser keeps it |
 
-The session is the server-side memory. The cookie usually holds only a random session ID — a ticket number. The real record lives on the server: who is logged in, what they're allowed to do, when the session ends.
+| Cookie vs session | |
+|---|---|
+| **Cookie** | Lives in the browser — usually holds only a random session ID, a ticket number |
+| **Session** | Lives on the server — the real record: who is logged in, what they're allowed, when it ends |
 
-A lab login, step by step: you open the login page with a GET; you type a lab username and a test password into the form — in this file, `your-user` and `<test-password>`; the browser sends a POST with the form data in the body; the server checks the pair against its own lab store, and if they don't match it answers with a login error and creates no session; if they match, it creates a new session with a fresh, random session ID and remembers who it belongs to and until when; it answers with `Set-Cookie` and a redirect to the main page; on every later ask the browser sends the cookie back; the server looks the session ID up in its own memory, and if it finds a live session it knows who you are and what you may do — if it finds nothing or an expired session, you're logged out; and when you log out, the server deletes the session and the browser drops the cookie, so the old ticket number stops working.
+**A lab login, in order:**
 
-That design has sharp edges worth remembering. The session ID must be long, random, impossible to guess, and it must change after login. If it's short, guessable, or stays the same before and after login, someone in a lab can copy or guess it and pretend to be that user. That's why broken authentication sits near the top of the OWASP list — the session is the key to the whole app.
-
-And three design errors to avoid in your own lab apps. Don't store the whole user record, or a password, inside a cookie — a cookie lives in the browser and can be read or copied, so store only a random ID and keep the record on the server. Don't let sessions live forever — a session that never expires is a key that never stops working, and logout must actually delete the session on the server, not just hide the page. And don't trust a cookie value without checking it on the server — if the server believes any cookie it receives, anyone can write their own and claim to be anyone.
-
-## HTTPS: the sealed envelope
-
-Plain HTTP sends requests and responses as readable text. Anyone on the road between browser and server who can see the traffic can read it.
-
-HTTPS is HTTP inside TLS, the sealed envelope, and it gives three things: encryption, so only browser and server can read the data; authentication, so the browser checks the server's certificate — a signed identity card — and confirms it's really talking to the server named in the URL; and integrity, so if anyone changes the data on the way, the check fails and the browser knows.
-
-The flow, simply: browser asks for a secure connection, server shows its certificate, browser checks it matches the host and is signed by a trusted authority, browser and server agree secret keys for this visit, and all HTTP traffic for the visit travels inside that encrypted channel. The same HTTP rules still apply inside — just in private.
-
-HTTPS protects data on the road. It does not make a web app safe by itself. A site can have perfect HTTPS and still have a broken login, broken access control, or an injection flaw. Those are app problems, and they're the subject of the OWASP file. Don't confuse "the road is sealed" with "the kitchen checks who you are."
-
-On your own machine, `http://127.0.0.1:8000` is safe for learning because the traffic never leaves your computer. That's the exception that proves the rule: localhost stays local. For any real network, even a lab network, prefer HTTPS, and never send a real password over plain HTTP.
-
-## Forms, JSON, APIs
-
-A form is a page asking you to fill in fields and send them. A simple form sends a POST with `Content-Type: application/x-www-form-urlencoded`, meaning the fields become `name=value&name=value` in the body:
-
-```
-POST /login HTTP/1.1
-Host: example.com
-Content-Type: application/x-www-form-urlencoded
-Content-Length: 48
-
-username=your-user&password=<test-password>
+```mermaid
+flowchart TD
+    A[GET login page] --> B[POST form<br/>your-user + test password, in body]
+    B --> C{Pair matches<br/>lab store?}
+    C -->|No| D[Login error<br/>no session created]
+    C -->|Yes| E[New session<br/>fresh, random session ID]
+    E --> F[Set-Cookie + redirect<br/>to main page]
+    F --> G[Every later ask sends cookie<br/>server checks session]
+    G --> H[Logout<br/>server deletes session,<br/>browser drops cookie]
 ```
 
-JSON is a plain way to write structured data as text so programs can send it to each other:
+Design rules for your own lab apps:
 
-```json
-{
-  "username": "your-user",
-  "page": 2,
-  "notes": ["first note", "second note"]
-}
-```
+| Rule | Why |
+|---|---|
+| Session ID long, random, unguessable, changed after login | A short / guessable / unchanged ID can be copied or guessed in lab |
+| Store only a random ID in the cookie, record on the server | Cookie lives in the browser and can be copied — never a user record or password in it |
+| Sessions expire; logout deletes the session on the server | A session that never expires is a key that never stops working; hiding the page is not logging out |
+| Check every cookie value on the server | If the server believes any cookie, anyone can write their own and claim to be anyone |
 
-Names in double quotes, values as text, numbers, true or false, null, lists in `[]`, or objects in `{}`. JSON is data, not code — a good server treats it as data and never runs it as code.
+## 7. HTTPS — the sealed envelope
 
-An API is a set of URLs and rules programs use to talk to each other instead of humans reading pages, and it usually returns JSON instead of HTML. `GET /api/notes?page=2` might return JSON with a list of notes, while `GET /notes?page=2` returns an HTML page with the same notes for a human. Same data, different shape, different audience.
+| Plain HTTP | HTTPS (HTTP inside TLS) |
+|---|---|
+| Readable text — anyone seeing traffic can read it | Encrypted — only browser and server can read it |
+| No server identity check | Authentication — certificate checked against the URL host |
+| Changes on the way go unnoticed | Integrity — changed data fails the check |
 
-This is the bridge to the JavaScript APIs you haven't covered yet. `fetch`, promises, and `async/await` are how a page in the browser talks to a web API. Learn the HTTP shape first and the JS code makes sense: `fetch` builds a request, the server answers, your code reads the status and the JSON. The page loads its HTML, its JavaScript runs and calls the API with `fetch`, the server checks the session, does the work, and answers with a status and a JSON body, and the code reads the status first — on 2xx it reads the JSON, on 4xx or 5xx it shows a safe error, not the raw server detail — then the page updates only the part that changed, without reloading.
+Flow: browser asks for a secure connection → server shows its certificate → browser checks host match + trusted authority → both agree secret keys for this visit → all HTTP travels inside that channel. Same HTTP rules inside — just in private.
 
-## How a page loads, end to end
+**Watch out:** HTTPS protects data on the road, not the app itself. Perfect HTTPS + broken login, broken access control, or injection is still broken — see `owasp-simple.md`. On your own machine, `http://127.0.0.1:8000` is safe for learning because traffic never leaves your computer. Elsewhere, prefer HTTPS, never send a real password over plain HTTP.
 
-Put it together. You type or click a URL. The browser splits it into scheme, host, port, path, query, fragment. DNS turns the host into an IP, unless it's already `127.0.0.1`. The browser connects on that IP and port, setting up TLS first for HTTPS. It sends the HTTP request — method, path, headers, cookies, body if any. The server checks session and permissions, does the work, and sends back status, headers, body. A redirect sends the browser back to the start with the new location. The browser reads the HTML, then asks for the images, styles, and scripts that page needs — each one another HTTP request through the same steps. JavaScript on the page may call APIs for more data, each one another request. The browser shows the finished page and keeps the cookies for the next visit.
+## 8. Forms, JSON, APIs
 
-Notice how many separate requests one "page" really is. A slow or broken page is often one slow or broken request among many. Once you learn to read requests one by one, in order, you stop guessing about web problems and start tracing them.
+| Shape | Example | Notes |
+|---|---|---|
+| Form POST | `username=your-user&password=<test-password>` in the body, form-encoded | Fields become `name=value&name=value` |
+| JSON | `{"username": "your-user", "page": 2, "notes": ["first note", "second note"]}` | Names in double quotes; values: text, numbers, true / false, null, `[]`, `{}` |
+| API | `GET /api/notes?page=2` returns JSON | Same data as `GET /notes?page=2` (HTML), different shape, different audience |
 
-## Lab: a web server on your own machine only
+JSON is data, not code — a good server treats it as data and never runs it as code.
 
-You don't need the internet, and you must not test a real site, to see all of this working.
+Page calling an API: HTML loads → JavaScript calls the API with `fetch` → server checks the session, answers status + JSON → code reads status first (2xx: read JSON; 4xx / 5xx: safe error, not raw server detail) → page updates only the part that changed.
 
-Make a small lab folder and one page:
+## 9. How a page loads, end to end
+
+1. Browser splits the URL — scheme, host, port, path, query, fragment.
+2. DNS turns the host into an IP, unless it's already `127.0.0.1`.
+3. Browser connects on that IP and port, TLS first for HTTPS.
+4. Browser sends the HTTP request — method, path, headers, cookies, body if any.
+5. Server checks session and permissions, does the work, sends status, headers, body.
+6. Redirect? Browser goes back to step 1 with the new location.
+7. Browser reads HTML, then asks for images, styles, scripts — each another request. JavaScript may call APIs — each another request.
+8. Browser shows the finished page, keeps cookies for the next visit.
+
+One "page" is really many requests. A slow or broken page is often one slow or broken request among many — read them one by one, in order.
+
+## 10. Lab pass — a web server on your own machine only
 
 ```bash
 mkdir -p ~/web-lab
 cd ~/web-lab
 echo "<h1>Hello from my own machine</h1>" > index.html
-ls -l
-```
-
-Start a simple server that listens on localhost only, port 8000, and leave that terminal open while you test. It serves only the files in `~/web-lab`, only to your own computer:
-
-```bash
 python3 -m http.server 8000 --bind 127.0.0.1
 ```
 
-In a second terminal, ask for the page with headers included:
+Leave that terminal open while you test — it serves only files in `~/web-lab`, only to your own computer. In a second terminal:
 
 ```bash
 curl -i http://127.0.0.1:8000/
-```
-
-Expect a `200 OK` status line, headers like Content-Type and Content-Length, a blank line, then your `<h1>Hello from my own machine</h1>` body. Then ask for something that doesn't exist:
-
-```bash
 curl -i http://127.0.0.1:8000/no-such-page
 ```
 
-Expect `404 Not Found`. Same server, same steps, different status — because the path asked for something the server doesn't have.
+| Ask | Expect |
+|---|---|
+| `/` | `200 OK`, Content-Type + Content-Length headers, blank line, your `<h1>` body |
+| `/no-such-page` | `404 Not Found` — same server, same steps, different status, because the path doesn't exist |
 
-Stop the server with `Ctrl+C` when you're done. A lab server left running is a door left open, even on localhost. And two setup errors to avoid: starting the server without `--bind 127.0.0.1`, so it listens on every interface instead of localhost only; and serving a folder that holds real personal files — serve only a small lab folder you made for the lesson, with only lab files in it.
+Stop the server with `Ctrl+C` when you're done — a lab server left running is a door left open, even on localhost.
 
-Next file: OWASP Top 10, as a defence map — what each risk means, how it happens in design, and what a safe design does instead. Read it as recognition training for your own lab apps, long before you ever test anyone else's system, and only ever with written permission.
+**Watch out:** without `--bind 127.0.0.1` it listens on every interface, not localhost only. Serve only a small lab folder you made for the lesson — never a folder holding real personal files.
 
-One line to carry forward: the web is a browser asking a server, in HTTP, for a thing named by a URL; the server checks who you are and what you may do, then answers with a status, headers, and a body — and cookies and sessions are how it remembers you between asks.
+Next → `owasp-simple.md`
+
+---
+*Lab only: systems you own or have written permission to test, test data only.*

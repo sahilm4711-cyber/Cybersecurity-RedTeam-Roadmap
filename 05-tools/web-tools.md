@@ -1,75 +1,117 @@
-# Web Tools
+# Web Tools — Visual Notes
 
-You know web basics, OWASP risks, and the tool mindset. Now you learn web tools — the tools you use to understand, check, and test a lab website you built yourself.
+Lab only · a lab site you built yourself, or a deliberately vulnerable lab app on your own machine · test data only
 
-Web tools don't make you a tester by themselves. They make visible what is already there: requests, responses, headers, cookies, and design flaws in your own lab app. The skill is reading those things, tracing them, and writing a clear note about them.
+Web tools make visible what is already there: requests, responses, headers, cookies, and design flaws in your own lab app. The skill is reading those, tracing them, and writing a clear note.
 
-Everything here is for a lab website you built yourself, or a deliberately vulnerable lab app installed only on your own machine. Never use a web proxy, scanner, or tester against a real website, login, or API without written permission. Use test data only — test usernames like `test-user`, test passwords as placeholders like `<test-password>`, and sample pages you created yourself. Never put a real username, password, token, cookie value, or real URL with a secret in a note, screenshot, or public file. Use placeholders: `<lab-url>`, `<test-password>`, `<session-id>`, `<token>`.
+Never against a real website, login, or API without written permission. Test data only: `test-user`, `<test-password>`, `<lab-url>`, `<session-id>`, `<token>` — never a real secret in a note or screenshot. A lab finding means: note it, fix it in your own lab app, re-test it.
 
-A web tool result is not permission to exploit a finding. In lab, a finding means: write a note, fix the design in your own lab app, and re-test your own fix.
+## 1. The four tools, at a glance
 
-## Browser developer tools: your first web tool, already installed
+| Tool | Shows you | Use it when |
+|---|---|---|
+| Browser dev tools | Requests, HTML, CSS, JS, cookies, console | First, every time — already installed |
+| `curl` | Raw request and response, one endpoint at a time | You want headers and body without rendering |
+| Lab proxy | Every request and response, in order | Tracing a lab login, form, or API call |
+| Lab scanner | Automated checks for common patterns | After manual tracing, one lab app, slowly |
 
-Developer tools are built into your browser. They show you, for a page you open: network requests, HTML structure, CSS, JavaScript, cookies, storage, and console messages.
+```mermaid
+flowchart LR
+    D[Dev tools<br/>see it] --> C[curl<br/>confirm it raw]
+    C --> P[Proxy<br/>trace it in order]
+    P --> S[Scanner<br/>check patterns]
+    S --> F[Fix in lab<br/>re-test once]
+```
 
-Learn these before any other web tool. They show you the same requests and responses every other web tool shows, but with no extra setup, and with no risk when you use them on your own lab page. They are the right tool every time you open a lab page to trace what it actually does — especially when a lab page doesn't work as expected, or when you want to understand a lab login, a lab form, or a lab API call.
+## 2. Browser developer tools — first, every time
 
-On your own lab page only: open it at `http://127.0.0.1:<lab-port>/`, open developer tools, Network tab, and reload once. Click the main HTML request and read the method, status code, request headers, response headers, and body, in your own words. Click a CSS or JavaScript request and note why the browser needed it. Open the Application / Storage tab, find cookies for your lab site only, and note the cookie names — not values — and whether HttpOnly is present. Close developer tools when you're done. Don't copy cookie values or tokens into a note.
+On your own lab page only (`http://127.0.0.1:<lab-port>/`):
 
-Read the Network tab for what it is: one row is one HTTP request, with method, path, status, size, and time. Status 200 means that request succeeded, for that resource, at that time. A request with a large size or long time is a clue, not a verdict — it may be a large image, a slow lab service, or a missing cache. Check the resource itself, in lab. Console errors are clues about JavaScript or loading problems in your lab page, not proof of a security flaw.
+1. Open dev tools → Network tab → clear it → reload once.
+2. Click the main HTML request. Read method, status, request headers, response headers, body — in your own words.
+3. Click a CSS or JS request. Note why the browser needed it.
+4. Application / Storage → cookies for your lab site only. Note cookie **names** — not values — and whether HttpOnly is present. Close dev tools when done.
 
-Two things to watch out for. Developer tools can't "hack" a page — they only show what the browser already received, and changing something in them only changes your own browser view, not the server. And clear the Network tab before reloading, or you'll read old requests as if they were new.
+| Network tab row | Means |
+|---|---|
+| One row | One HTTP request: method, path, status, size, time |
+| 200 | That request succeeded, for that resource, at that time |
+| Large / slow, console error | Clues, not verdicts — check the resource itself |
 
-## `curl`: the browser without the page
+**Watch out:** dev tools can't "hack" a page — they only show what the browser already received, and edits there only change your own browser view, not the server. Clear the Network tab before reloading, or you'll read old requests as new.
 
-`curl` makes HTTP requests and shows the response, without rendering a page. You met it in network tools. As a web tool, its value is that it shows the raw request and response, and lets you test one lab endpoint at a time. A browser hides details for good user experience. `curl` shows them: status line, headers, body, and, with the right flags, the request it sent. That is how you actually learn HTTP.
+## 3. `curl` — the browser without the page
 
-Against your own lab web service only, one endpoint at a time, with test data only:
+`curl` makes HTTP requests and shows the response without rendering. A browser hides details; `curl` shows status line, headers, body, and, with the right flags, the request it sent. That is how you actually learn HTTP.
+
+Against your own lab web service only, one endpoint at a time:
 
 ```bash
 curl -i http://127.0.0.1:<lab-port>/
 curl -i http://127.0.0.1:<lab-port>/lab-notes
 ```
 
-The `-i` flag includes response headers, not just the body. The first command asks for the lab home page. The second asks for a lab notes page you created yourself, if you have one.
+`-i` includes response headers, not just the body. The second asks for a lab notes page you created yourself, if you have one.
 
-Read it line by line. `HTTP/1.1 200 OK` means that lab endpoint returned success for that request. `Content-Type: text/html` means the body is HTML; `application/json` means it is JSON. `Set-Cookie: session_id=<...>` means the lab server asked the browser to store a session cookie — in a note, write `<session-id>`, not the real value. The body is the actual page or data. Read it as data, not as code, unless it is a page you wrote yourself in lab.
+`HTTP/1.1 200 OK` = that lab endpoint returned success for that request. `Content-Type: text/html` = HTML body; `application/json` = JSON. `Set-Cookie: session_id=<...>` = lab server asked the browser to store a session cookie — in a note, write `<session-id>`, not the real value. Body = the actual page or data.
 
-Don't send a real password or token with `curl` and then share your command history or a screenshot publicly. And don't mistake a `curl` success for security — it only means the service responded to that one request. Also, don't follow redirects blindly or download a file without checking what it is first, even in lab.
+**Watch out:** don't send a real password or token with `curl`, then share history or a screenshot publicly. A `curl` success only means the service responded to that one request — not that it is secure. Don't follow redirects blindly or download a file unchecked, even in lab.
 
-## Web proxies in lab: seeing requests in the middle, on your own traffic only
+## 4. Web proxy in lab — seeing requests in the middle
 
-A web proxy, in lab, sits between your browser and your lab server. Your browser sends requests to the proxy, the proxy forwards them to the lab server, and it shows you each request and response, so you can read, pause, or change them — for your own lab traffic only.
+A proxy sits between your browser and your lab server, showing each request and response — your own lab traffic only. Like the Network tab, with more header and body detail.
 
-A proxy makes the invisible visible. A browser hides some steps. A proxy shows every request, in order, with headers and body, so you can trace a lab login, a lab form, or a lab API call, step by step.
+```mermaid
+flowchart LR
+    B[Your browser] --> P[Lab proxy<br/>logs each request + response]
+    P --> S[Your lab server<br/>localhost, test data only]
+    S --> P
+    P --> B
+```
 
-The lab setup, in outline: start your own lab web service with test data only, on localhost. Start a lab proxy tool on your own machine, following its own documentation, for lab traffic only. Configure your own browser to use that proxy for lab traffic only, if the tool requires it. Open your own lab page once, and read the proxy log: one request, method, path, status, headers, body, in order. If your proxy allows it, pause one lab request, read it, and release it unchanged, to see how pausing works. Don't change a request to bypass a lab check unless you are deliberately testing your own lab fix, with your own data, and you write a note about what you changed and why. When you're done, turn the proxy off, restore your browser settings, and stop the lab service.
+Lab setup, in outline:
 
-A proxy log is a list of HTTP requests and responses, in order, for your own lab traffic — like the Network tab, but with more detail about headers and body. A request you changed in a proxy is not what the browser originally sent, so note in your lab notes whether a request was original or changed, and what you changed, with test data only. And a proxy does not prove a flaw. It proves what requests were made, and what responses came back, in that lab session.
+1. Start your lab web service (test data only, localhost) and a lab proxy tool on your own machine, following its own docs, for lab traffic only.
+2. Configure your browser to use that proxy for lab traffic only, if required. Open your lab page once and read the proxy log: one request, method, path, status, headers, body, in order. If allowed, pause one lab request, read it, release it unchanged.
+3. When done: turn the proxy off, restore browser settings, stop the lab service.
 
-The hard lines here are simple. Leaving a proxy on after lab, so all your browsing goes through it, is a mistake — turn it off when lab ends. Intercepting traffic that is not yours is the line between lab learning and a privacy violation. Never set a proxy to intercept traffic from other people, or on a shared, school, or company network, and never use one to change requests to a real website.
+A changed request is not what the browser originally sent — note original vs changed, test data only. A proxy proves what was requested and returned, not that a flaw exists. Only bypass a lab check when deliberately testing your own lab fix, with a note about what you changed and why.
 
-## Web scanners in lab: automated checks, with limits
+**Watch out:** leaving a proxy on after lab is a mistake. Intercepting traffic that is not yours — other people, or a shared, school, or company network — is a privacy violation.
 
-A web scanner automatically sends many requests to a web app, looking for common design flaws: missing headers, known patterns, error messages, and so on. Think of it as a checklist run by a program, not a human tester.
+## 5. Web scanner in lab — automated checks, with limits
 
-A scanner can find obvious, common issues in your own lab app quickly, so you can fix them and learn what they look like. It cannot understand your lab app's logic, its permissions, or its business rules — only a human tracing requests can do that.
+A scanner sends many requests to a web app, looking for common flaws: missing headers, known patterns, error messages. A checklist run by a program, not a human tester — it cannot understand your lab app's logic, permissions, or business rules.
 
-Run one only against a lab web app you built yourself, or a deliberately vulnerable lab app on your own machine, after you have written down why you are scanning it, and only with a small, slow scan, one lab app at a time. Never run a web scanner against a real website, login, or API. Scanners send many requests, they are noisy, they are logged, and they can cause damage — for example by creating, changing, or deleting data through forms. Running one without written permission is unauthorised testing, even if you "only wanted to check".
+Lab rhythm:
 
-The lab rhythm: build or install the lab app with test data only, write down in one sentence what you want the scanner to check, run it once, slowly, with its default safe settings for lab if it has them. Read each finding, one by one, and for each ask: is this a real design flaw in my lab app, or a false positive? What request caused it? What would a safe design do instead? Fix one finding in your own lab app, re-run the scanner once for that finding only, and note whether it is gone. Stop the lab app and the scanner when you're done. Don't publish the scanner report with real data — write a summary with placeholders.
+1. Build or install the lab app, test data only. Write in one sentence what you want the scanner to check.
+2. Run it once, slowly, default safe settings for lab — one lab app at a time.
+3. Read each finding: real flaw, or false positive? What request caused it? What would a safe design do instead?
+4. Fix one finding, re-run once for that finding only, note whether it is gone. Stop the app and scanner; summarise with placeholders.
 
-A scanner finding is a clue, not a verdict. It says: "This lab app behaved in a way that matches a common pattern." It does not say: "This app is exploitable" or "This app is safe." False positives are normal — a scanner does not know your lab app's intent, so you must check each finding by tracing the request and response yourself, in lab. And no findings does not mean secure. A scanner only checks patterns it knows, with inputs it tries. It does not check your app's logic, permissions, or custom flaws.
+| Scanner says | Means | Doesn't mean |
+|---|---|---|
+| A finding | This lab app behaved in a way that matches a common pattern | This app is exploitable |
+| No findings | No known pattern matched, in that scan | This app is secure — logic, permissions, custom flaws aren't checked |
 
-Don't copy a scanner report into a resume or public file without understanding each finding, and don't run aggressive settings without understanding what they do — they can change or delete data, even in lab. "Free" and "common" are not permission.
+**Watch out:** scanners are noisy, logged, and can change or delete data through forms — even in lab. Never run one against a real website, login, or API. Don't run aggressive settings blind, or copy a report into a resume or public file without understanding each finding. "Free" and "common" are not permission.
 
-## Putting it together: one lab web check
+## 6. Lab pass — one lab web check
 
-When you have a lab app to check, work in this order: start the lab app on localhost with test data only. Open it in a browser with developer tools Network tab open, reload once, and trace the main request. Run `curl -i` once against the same lab URL, and compare the status and headers with the browser trace — do they match? If you have a lab proxy, read its log for that one lab session, in order, and note any request you don't understand. If you have a lab scanner, run it once, slowly, against that one lab app only, read each finding, and check it by tracing the request yourself. For each real flaw you find in your own lab app, write a note: what it is, what request caused it, what a safe design does instead, and how you fixed it in lab. Re-test your fix once, with the same tool, for that finding only. Then clean up: stop the lab app, turn off the proxy, close developer tools, and don't publish real tokens, cookies, or data.
+1. Start the lab app on localhost, test data only. Browser + dev tools Network tab: reload once, trace the main request.
+2. `curl -i` once against the same lab URL. Compare status and headers with the browser trace — do they match?
+3. Proxy log for that one session, in order, if you have one. Scanner once, slowly, against that one app only, if you have one; check each finding by tracing the request yourself.
+4. For each real flaw, note: what it is, what request caused it, what a safe design does instead, how you fixed it. Re-test the fix once, same tool, that finding only.
+5. Clean up: stop the lab app, turn off the proxy, close dev tools, don't publish real tokens, cookies, or data.
 
-That is the web version of the tool mindset from `tools-overview.md`: question first, smallest tool first, trace first, note first, fix in lab, re-test once. A professional web tester follows this pattern, with written permission, on a real scope, later. A learner follows it now, in lab, to build the habit.
+That is the tool mindset from `tools-overview.md`, applied to the web: question first, smallest tool first, trace, note, fix in lab, re-test once.
 
-One last thread: a web tool can change data, even in lab, if it submits a form or follows a link that deletes something. Use test data, and be ready to rebuild your lab app if a test changes it. And close everything you opened — a lab server left running, or a proxy left on, after lab ends is how a tidy session turns into a leak.
+**Watch out:** a web tool can change data, even in lab, if it submits a form or follows a deleting link. Use test data, be ready to rebuild your lab app. A lab server or proxy left on after lab ends is how a tidy session turns into a leak.
+
+**Done when you can:** trace one lab request through dev tools, `curl`, and (if you use one) a proxy log, and say what each one added.
+
+Next → `password-tools.md`
 
 ---
-*All examples here are for your own machine or your own private lab only. Use test data only. Never publish a real username, password, token, cookie value, or real URL with a secret in a note or public file.*
+*Lab only: systems you own or have written permission to test, test data only. Never publish a real username, password, token, cookie value, or real URL with a secret.*
