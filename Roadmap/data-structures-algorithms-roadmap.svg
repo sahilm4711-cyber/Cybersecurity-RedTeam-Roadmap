@@ -1,0 +1,169 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="2110" viewBox="0 0 1200 2110" font-family="Arial, Helvetica, sans-serif">
+<rect width="100%" height="100%" fill="white"/>
+<text x="600" y="50" text-anchor="middle" font-size="32" font-weight="bold" fill="#111827">Data Structures &amp; Algorithms</text>
+<text x="600" y="82" text-anchor="middle" font-size="16" fill="#374151">Supporting Skill for Cyber Security  •  Basics First, Not Advanced First</text>
+<line x1="600" y1="100" x2="600" y2="120" stroke="#2563eb" stroke-width="3"/>
+<line x1="600" y1="120" x2="600" y2="150" stroke="#2563eb" stroke-width="3"/>
+<rect x="350" y="120" width="500" height="62" rx="8" fill="#fde047" stroke="#111827" stroke-width="1.5"/>
+<text x="600" y="148" text-anchor="middle" font-size="18" font-weight="bold" fill="#111827">Pick a Language</text>
+<text x="600" y="172" text-anchor="middle" font-size="12" fill="#374151">Python first for cyber</text>
+<line x1="600" y1="182" x2="600" y2="202" stroke="#2563eb" stroke-width="2"/>
+<line x1="240" y1="202" x2="960" y2="202" stroke="#2563eb" stroke-width="2"/>
+<line x1="240" y1="202" x2="240" y2="212" stroke="#2563eb" stroke-width="2"/>
+<rect x="130" y="212" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="240" y="238" text-anchor="middle" font-size="13" fill="#111827">Python</text>
+<line x1="480" y1="202" x2="480" y2="212" stroke="#2563eb" stroke-width="2"/>
+<rect x="370" y="212" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="480" y="238" text-anchor="middle" font-size="13" fill="#111827">Language Syntax</text>
+<line x1="720" y1="202" x2="720" y2="212" stroke="#2563eb" stroke-width="2"/>
+<rect x="610" y="212" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="720" y="238" text-anchor="middle" font-size="13" fill="#111827">Control Structures</text>
+<line x1="960" y1="202" x2="960" y2="212" stroke="#2563eb" stroke-width="2"/>
+<rect x="850" y="212" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="960" y="238" text-anchor="middle" font-size="13" fill="#111827">Functions &amp; OOP</text>
+<line x1="600" y1="274" x2="600" y2="332" stroke="#2563eb" stroke-width="3"/>
+<rect x="350" y="302" width="500" height="62" rx="8" fill="#fde047" stroke="#111827" stroke-width="1.5"/>
+<text x="600" y="330" text-anchor="middle" font-size="18" font-weight="bold" fill="#111827">Programming Fundamentals</text>
+<text x="600" y="354" text-anchor="middle" font-size="12" fill="#374151">Logic before DSA</text>
+<line x1="600" y1="364" x2="600" y2="384" stroke="#2563eb" stroke-width="2"/>
+<line x1="240" y1="384" x2="960" y2="384" stroke="#2563eb" stroke-width="2"/>
+<line x1="240" y1="384" x2="240" y2="394" stroke="#2563eb" stroke-width="2"/>
+<rect x="130" y="394" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="240" y="420" text-anchor="middle" font-size="13" fill="#111827">Variables &amp; Loops</text>
+<line x1="480" y1="384" x2="480" y2="394" stroke="#2563eb" stroke-width="2"/>
+<rect x="370" y="394" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="480" y="420" text-anchor="middle" font-size="13" fill="#111827">Pseudo Code</text>
+<line x1="720" y1="384" x2="720" y2="394" stroke="#2563eb" stroke-width="2"/>
+<rect x="610" y="394" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="720" y="420" text-anchor="middle" font-size="13" fill="#111827">Functions</text>
+<line x1="960" y1="384" x2="960" y2="394" stroke="#2563eb" stroke-width="2"/>
+<rect x="850" y="394" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="960" y="420" text-anchor="middle" font-size="13" fill="#111827">OOP Basics</text>
+<line x1="600" y1="456" x2="600" y2="514" stroke="#2563eb" stroke-width="3"/>
+<rect x="350" y="484" width="500" height="62" rx="8" fill="#fde047" stroke="#111827" stroke-width="1.5"/>
+<text x="600" y="512" text-anchor="middle" font-size="18" font-weight="bold" fill="#111827">Basic Data Structures</text>
+<text x="600" y="536" text-anchor="middle" font-size="12" fill="#374151">How data is stored</text>
+<line x1="600" y1="546" x2="600" y2="566" stroke="#2563eb" stroke-width="2"/>
+<line x1="240" y1="566" x2="960" y2="566" stroke="#2563eb" stroke-width="2"/>
+<line x1="240" y1="566" x2="240" y2="576" stroke="#2563eb" stroke-width="2"/>
+<rect x="130" y="576" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="240" y="602" text-anchor="middle" font-size="13" fill="#111827">Array &amp; String</text>
+<line x1="480" y1="566" x2="480" y2="576" stroke="#2563eb" stroke-width="2"/>
+<rect x="370" y="576" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="480" y="602" text-anchor="middle" font-size="13" fill="#111827">Linked List</text>
+<line x1="720" y1="566" x2="720" y2="576" stroke="#2563eb" stroke-width="2"/>
+<rect x="610" y="576" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="720" y="602" text-anchor="middle" font-size="13" fill="#111827">Stack &amp; Queue</text>
+<line x1="960" y1="566" x2="960" y2="576" stroke="#2563eb" stroke-width="2"/>
+<rect x="850" y="576" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="960" y="602" text-anchor="middle" font-size="13" fill="#111827">Hash Table</text>
+<line x1="600" y1="638" x2="600" y2="696" stroke="#2563eb" stroke-width="3"/>
+<rect x="350" y="666" width="500" height="62" rx="8" fill="#fde047" stroke="#111827" stroke-width="1.5"/>
+<text x="600" y="694" text-anchor="middle" font-size="18" font-weight="bold" fill="#111827">Algorithmic Complexity</text>
+<text x="600" y="718" text-anchor="middle" font-size="12" fill="#374151">How fast is it?</text>
+<line x1="600" y1="728" x2="600" y2="748" stroke="#2563eb" stroke-width="2"/>
+<line x1="240" y1="748" x2="960" y2="748" stroke="#2563eb" stroke-width="2"/>
+<line x1="240" y1="748" x2="240" y2="758" stroke="#2563eb" stroke-width="2"/>
+<rect x="130" y="758" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="240" y="784" text-anchor="middle" font-size="13" fill="#111827">Big-O Notation</text>
+<line x1="480" y1="748" x2="480" y2="758" stroke="#2563eb" stroke-width="2"/>
+<rect x="370" y="758" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="480" y="784" text-anchor="middle" font-size="13" fill="#111827">Time Complexity</text>
+<line x1="720" y1="748" x2="720" y2="758" stroke="#2563eb" stroke-width="2"/>
+<rect x="610" y="758" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="720" y="784" text-anchor="middle" font-size="13" fill="#111827">Space Complexity</text>
+<line x1="960" y1="748" x2="960" y2="758" stroke="#2563eb" stroke-width="2"/>
+<rect x="850" y="758" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="960" y="784" text-anchor="middle" font-size="13" fill="#111827">Common Runtimes</text>
+<line x1="600" y1="820" x2="600" y2="878" stroke="#2563eb" stroke-width="3"/>
+<rect x="350" y="848" width="500" height="62" rx="8" fill="#fde047" stroke="#111827" stroke-width="1.5"/>
+<text x="600" y="876" text-anchor="middle" font-size="18" font-weight="bold" fill="#111827">Sorting &amp; Searching</text>
+<text x="600" y="900" text-anchor="middle" font-size="12" fill="#374151">Find it fast</text>
+<line x1="600" y1="910" x2="600" y2="930" stroke="#2563eb" stroke-width="2"/>
+<line x1="240" y1="930" x2="960" y2="930" stroke="#2563eb" stroke-width="2"/>
+<line x1="240" y1="930" x2="240" y2="940" stroke="#2563eb" stroke-width="2"/>
+<rect x="130" y="940" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="240" y="966" text-anchor="middle" font-size="13" fill="#111827">Bubble &amp; Merge Sort</text>
+<line x1="480" y1="930" x2="480" y2="940" stroke="#2563eb" stroke-width="2"/>
+<rect x="370" y="940" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="480" y="966" text-anchor="middle" font-size="13" fill="#111827">Quick &amp; Selection Sort</text>
+<line x1="720" y1="930" x2="720" y2="940" stroke="#2563eb" stroke-width="2"/>
+<rect x="610" y="940" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="720" y="966" text-anchor="middle" font-size="13" fill="#111827">Linear Search</text>
+<line x1="960" y1="930" x2="960" y2="940" stroke="#2563eb" stroke-width="2"/>
+<rect x="850" y="940" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="960" y="966" text-anchor="middle" font-size="13" fill="#111827">Binary Search</text>
+<line x1="600" y1="1002" x2="600" y2="1060" stroke="#2563eb" stroke-width="3"/>
+<rect x="350" y="1030" width="500" height="62" rx="8" fill="#fde047" stroke="#111827" stroke-width="1.5"/>
+<text x="600" y="1058" text-anchor="middle" font-size="18" font-weight="bold" fill="#111827">Tree Data Structures</text>
+<text x="600" y="1082" text-anchor="middle" font-size="12" fill="#374151">Branching data</text>
+<line x1="600" y1="1092" x2="600" y2="1112" stroke="#2563eb" stroke-width="2"/>
+<line x1="240" y1="1112" x2="960" y2="1112" stroke="#2563eb" stroke-width="2"/>
+<line x1="240" y1="1112" x2="240" y2="1122" stroke="#2563eb" stroke-width="2"/>
+<rect x="130" y="1122" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="240" y="1148" text-anchor="middle" font-size="13" fill="#111827">Binary Trees</text>
+<line x1="480" y1="1112" x2="480" y2="1122" stroke="#2563eb" stroke-width="2"/>
+<rect x="370" y="1122" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="480" y="1148" text-anchor="middle" font-size="13" fill="#111827">Binary Search Trees</text>
+<line x1="720" y1="1112" x2="720" y2="1122" stroke="#2563eb" stroke-width="2"/>
+<rect x="610" y="1122" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="720" y="1148" text-anchor="middle" font-size="13" fill="#111827">Tree Traversal</text>
+<line x1="960" y1="1112" x2="960" y2="1122" stroke="#2563eb" stroke-width="2"/>
+<rect x="850" y="1122" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="960" y="1148" text-anchor="middle" font-size="13" fill="#111827">Heap Basics</text>
+<line x1="600" y1="1184" x2="600" y2="1242" stroke="#2563eb" stroke-width="3"/>
+<rect x="350" y="1212" width="500" height="62" rx="8" fill="#fde047" stroke="#111827" stroke-width="1.5"/>
+<text x="600" y="1240" text-anchor="middle" font-size="18" font-weight="bold" fill="#111827">Graph Data Structures</text>
+<text x="600" y="1264" text-anchor="middle" font-size="12" fill="#374151">Connected data</text>
+<line x1="600" y1="1274" x2="600" y2="1294" stroke="#2563eb" stroke-width="2"/>
+<line x1="240" y1="1294" x2="960" y2="1294" stroke="#2563eb" stroke-width="2"/>
+<line x1="240" y1="1294" x2="240" y2="1304" stroke="#2563eb" stroke-width="2"/>
+<rect x="130" y="1304" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="240" y="1330" text-anchor="middle" font-size="13" fill="#111827">Graph Basics</text>
+<line x1="480" y1="1294" x2="480" y2="1304" stroke="#2563eb" stroke-width="2"/>
+<rect x="370" y="1304" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="480" y="1330" text-anchor="middle" font-size="13" fill="#111827">BFS — Breadth First</text>
+<line x1="720" y1="1294" x2="720" y2="1304" stroke="#2563eb" stroke-width="2"/>
+<rect x="610" y="1304" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="720" y="1330" text-anchor="middle" font-size="13" fill="#111827">DFS — Depth First</text>
+<line x1="960" y1="1294" x2="960" y2="1304" stroke="#2563eb" stroke-width="2"/>
+<rect x="850" y="1304" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="960" y="1330" text-anchor="middle" font-size="13" fill="#111827">Shortest Path Idea</text>
+<line x1="600" y1="1366" x2="600" y2="1424" stroke="#2563eb" stroke-width="3"/>
+<rect x="350" y="1394" width="500" height="62" rx="8" fill="#fde047" stroke="#111827" stroke-width="1.5"/>
+<text x="600" y="1422" text-anchor="middle" font-size="18" font-weight="bold" fill="#111827">Advanced &amp; Problem Solving</text>
+<text x="600" y="1446" text-anchor="middle" font-size="12" fill="#374151">Think in patterns</text>
+<line x1="600" y1="1456" x2="600" y2="1476" stroke="#2563eb" stroke-width="2"/>
+<line x1="240" y1="1476" x2="960" y2="1476" stroke="#2563eb" stroke-width="2"/>
+<line x1="240" y1="1476" x2="240" y2="1486" stroke="#2563eb" stroke-width="2"/>
+<rect x="130" y="1486" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="240" y="1512" text-anchor="middle" font-size="13" fill="#111827">Two Pointers</text>
+<line x1="480" y1="1476" x2="480" y2="1486" stroke="#2563eb" stroke-width="2"/>
+<rect x="370" y="1486" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="480" y="1512" text-anchor="middle" font-size="13" fill="#111827">Sliding Window</text>
+<line x1="720" y1="1476" x2="720" y2="1486" stroke="#2563eb" stroke-width="2"/>
+<rect x="610" y="1486" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="720" y="1512" text-anchor="middle" font-size="13" fill="#111827">Recursion</text>
+<line x1="960" y1="1476" x2="960" y2="1486" stroke="#2563eb" stroke-width="2"/>
+<rect x="850" y="1486" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="960" y="1512" text-anchor="middle" font-size="13" fill="#111827">Dynamic Programming Idea</text>
+<line x1="600" y1="1548" x2="600" y2="1606" stroke="#2563eb" stroke-width="3"/>
+<rect x="350" y="1576" width="500" height="62" rx="8" fill="#fde047" stroke="#111827" stroke-width="1.5"/>
+<text x="600" y="1604" text-anchor="middle" font-size="18" font-weight="bold" fill="#111827">DSA in Cyber Security</text>
+<text x="600" y="1628" text-anchor="middle" font-size="12" fill="#374151">Supporting skill, not main path</text>
+<line x1="600" y1="1638" x2="600" y2="1658" stroke="#2563eb" stroke-width="2"/>
+<line x1="240" y1="1658" x2="960" y2="1658" stroke="#2563eb" stroke-width="2"/>
+<line x1="240" y1="1658" x2="240" y2="1668" stroke="#2563eb" stroke-width="2"/>
+<rect x="130" y="1668" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="240" y="1694" text-anchor="middle" font-size="13" fill="#111827">Hashing &amp; Passwords</text>
+<line x1="480" y1="1658" x2="480" y2="1668" stroke="#2563eb" stroke-width="2"/>
+<rect x="370" y="1668" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="480" y="1694" text-anchor="middle" font-size="13" fill="#111827">Graph for AD &amp; Networks</text>
+<line x1="720" y1="1658" x2="720" y2="1668" stroke="#2563eb" stroke-width="2"/>
+<rect x="610" y="1668" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="720" y="1694" text-anchor="middle" font-size="13" fill="#111827">Tree for Filesystem</text>
+<line x1="960" y1="1658" x2="960" y2="1668" stroke="#2563eb" stroke-width="2"/>
+<rect x="850" y="1668" width="220" height="62" rx="8" fill="#fef9c3" stroke="#111827" stroke-width="1.2"/>
+<text x="960" y="1694" text-anchor="middle" font-size="13" fill="#111827">Log Search &amp; Sorting</text>
+<text x="600" y="2080" text-anchor="middle" font-size="13" fill="#374151">Lab only — practise only on systems you own or have written permission to test. Test data only.</text>
+</svg>
