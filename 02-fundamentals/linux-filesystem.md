@@ -1,60 +1,76 @@
-# Linux Filesystem — The Layout, and Why Permissions Are the Job
+# Linux Filesystem — Visual Notes
 
-Lab only, own machine only, test files you made yourself. Never change a system folder you don't understand, never read anyone else's private files, and never change permissions on a system you don't own. In a lab, practise on test folders first.
+Lab only · own machine · test files only
 
-This is the file that pays for itself. Networks, web servers, system audits — they all come back to the same question: who can read this, who can change this, and who should not.
+## 1. One tree, one entrance
 
-## The building
+```mermaid
+flowchart TD
+    R["/ — root<br/>top of everything"] --> H["/home<br/>users' rooms"]
+    R --> E["/etc<br/>settings"]
+    R --> V["/var<br/>changing data · logs"]
+    R --> U["/usr<br/>programs + libraries"]
+    R --> T["/tmp<br/>short-lived files"]
+    R --> O["/opt<br/>hand-installed software"]
+    R --> S["/dev · /proc · /sys<br/>devices + live system views"]
+```
 
-Linux has one tree, starting at `/`. No drive letters. Everything hangs off that root.
+No drive letters. Everything hangs off `/`.
 
-Think of it as a building with one entrance. Folders are rooms, each with a designed purpose — you don't invent new top-level rooms for fun, you use the rooms for what they were built for. Files are papers in those rooms. A full path is an address: `/home/your-user/projects/notes.txt` is entrance, then `home`, then `your-user`, then `projects`, then the file. Permissions are the keys to the rooms and the papers.
+```
+/home/your-user/projects/notes.txt
+  │      │          │         │
+  root   home     user      file
+```
 
-The separation is deliberate, and it is a security design, not just tidiness. User files sit apart from system files so a user mistake doesn't break the system. Settings sit apart from logs so you can check one without mixing it with the other. Temporary files sit apart from permanent ones so short-lived mess doesn't pollute real data. When you audit a system, you are really checking whether that separation is still intact, or whether someone has mixed things up, opened keys too wide, or left sensitive data in a temporary spot.
+| Idea | Means |
+|---|---|
+| Path | Address in the tree |
+| Folder | A file that lists other files |
+| Separation | Users apart from system, settings apart from logs, temp apart from permanent — so one mistake doesn't break everything |
 
-## The folders that matter
+Audit question, every time: is that separation still intact, or has something been opened too wide, mixed up, or left in a temp spot?
 
-| Folder | What lives there |
-|--------|------------------|
-| `/` | Root, top of everything |
-| `/home` | Each normal user's personal folder, like `/home/your-user` |
-| `/root` | Root's home only; normal users don't go in |
-| `/etc` | System-wide settings |
-| `/var` | Data that changes often — logs, caches, service data |
-| `/tmp` | Short-lived temporary files, often cleared on reboot |
-| `/usr` | User programs, libraries, documentation |
-| `/bin` | Essential commands like `ls`, `cat`, `cp` (often linked from `/usr/bin` on modern systems) |
-| `/sbin` | System admin commands like `ip` |
-| `/opt` | Software installed by hand, outside system packages |
-| `/boot` | Files needed to start the computer — do not touch without understanding |
-| `/dev` | Devices presented as files |
-| `/proc` | Live process and kernel info, not real files on disk |
-| `/sys` | Live hardware and kernel info, like `/proc` but for devices |
-| `/mnt`, `/media` | Mount points for external drives and other filesystems |
+## 2. The folders that matter
 
-Run `ls /` on your own machine and compare. The exact list varies by system, and that variation is normal.
-
-**`/` — root.** Don't create random folders here. Top-level layout belongs to the OS. Practise in `/home` or a test folder. In an audit, `/` should be root-owned and not writable by everyone — if it is, the whole design is broken.
-
-**`/home` — users' homes.** Your room in the building: projects, notes, downloads, and your own settings (hidden files starting with `.`, like `.bashrc`).
+| Folder | Lives there | Your move |
+|---|---|---|
+| `/` | Top of everything | Don't create random folders here |
+| `/home` | Each user's folder, e.g. `/home/your-user` | Work here |
+| `/root` | Root's home only | Normal users don't enter; if one can read it, note it |
+| `/etc` | System-wide settings | Back up before changing anything, one line at a time |
+| `/var` | Logs, caches, service data | `/var/log` = history book; `/var/lib` = service data |
+| `/tmp` | Short-lived files, often cleared on reboot | Never important work, never private data |
+| `/usr` | Programs, libraries, docs | `/usr/bin` holds most commands |
+| `/bin` | Essential commands: `ls`, `cat`, `cp` | Often linked from `/usr/bin` |
+| `/sbin` | Admin commands, e.g. `ip` | Root-owned, not user-writable |
+| `/opt` | Hand-installed software | Note what, when, why — untracked = hard to audit |
+| `/boot` | Files to start the machine | Don't practise here |
+| `/dev` | Devices as files | See §3 |
+| `/proc` | Live process + kernel info, not disk files | See §3 |
+| `/sys` | Live hardware + kernel info | See §3 |
+| `/mnt`, `/media` | Mount points for external drives | — |
 
 ```bash
+ls /
 ls -l /home
-ls -l ~
+ls -ld ~
 pwd
 ```
 
-`~` means your home folder. Don't enter another user's home without permission, and don't delete one. Check your own home's permissions with `ls -ld ~` and understand what the letters mean — Section 4 below.
+Exact list varies by system. That's normal.
 
-**`/root` — root's home.** Normal users can't normally enter it, by design. If one can read it in a lab, that is a serious permission problem to note, not something to use.
+## 3. `/etc`, `/var`, and the virtual folders
 
-**`/etc` — the control room.** System-wide settings live here:
+### `/etc` — the control room
 
-- `/etc/hostname` — the machine's name, plain text.
-- `/etc/hosts` — local name-to-IP mappings, checked before DNS in some cases.
-- `/etc/passwd` — list of users, with user ID, group ID, home folder, and shell. Modern Linux does not store passwords here in plain text.
-- `/etc/shadow` — protected password hashes, root only. Do not read it, copy it, or share it. Checking that its permissions are root-only is enough for an audit; you will never be asked to read its contents in this roadmap.
-- Service settings, often a folder per service under `/etc`, like `/etc/ssh/` if SSH is installed in a lab.
+| File | Holds |
+|---|---|
+| `/etc/hostname` | Machine name, plain text |
+| `/etc/hosts` | Local name-to-IP mappings, checked before DNS in some cases |
+| `/etc/passwd` | Users: ID, group ID, home, shell — no plain-text passwords |
+| `/etc/shadow` | Protected password hashes, root only |
+| `/etc/ssh/` etc. | One folder per service, if installed in a lab |
 
 ```bash
 ls -l /etc/hostname
@@ -62,187 +78,200 @@ cat /etc/hostname
 ls -l /etc/
 ```
 
-Only `cat` files you understand and are allowed to read in your own lab. Before changing any settings file in a lab, back it up — copy it to a test name first, change one line at a time, and note what you changed and why. Settings are a top audit target: are lab defaults changed, are unnecessary services disabled, are settings files too open? Those are design questions, not just file checks.
+**Watch out:** checking that `/etc/shadow` is root-only is enough for an audit. Never read, copy, or share its contents.
 
-**`/var` — changing data, especially logs.** `/var/log` is the history book: what happened, when, who did what, what failed. `/var/lib` often holds service data, like a database's files in a lab setup.
+### `/var` — changing data
 
 ```bash
 ls -l /var/log | head -20
 ```
 
-Start with names and permissions. Your own lab logs are for learning what logs look like. Don't delete logs to "clean up" — in a real job, logs are evidence, and deleting them hides history. A system with no logs, or logs any normal user can rewrite, is hard to defend. A good lab test should also be detectable in logs.
+Logs are evidence: what happened, when, who, what failed. Don't delete logs to "clean up". A system with no logs, or logs any normal user can rewrite, is hard to defend. A good lab test should also show up in logs.
 
-**`/tmp` — temporary files.** Programs use it for short-lived work. Don't store important notes here; they may vanish on reboot. And don't put private data here — temporary files readable by everyone are a classic lab finding.
+### `/dev`, `/proc`, `/sys` — everything is a file
 
-**`/usr`, `/bin`, `/sbin`.** `/usr/bin` holds most user commands — `python3`, `grep`, `ls`. `/bin` holds the essentials, `/sbin` the admin commands. All three should be root-owned and not writable by normal users. If a normal user can rewrite a program in `/usr/bin`, that program changes for everyone.
+```mermaid
+flowchart LR
+    D["/dev<br/>devices as files"] --> N["/dev/null<br/>discards what you write"]
+    P["/proc<br/>live processes"] --> C["cat /proc/cpuinfo<br/>ls /proc = one folder per PID"]
+    S["/sys<br/>live hardware"] --> R["Read-only exploring<br/>in a lab is fine"]
+```
+
+| Example | Means |
+|---|---|
+| `command > /dev/null` | Throw output away |
+| `/dev/sda` (name varies) | A disk as a file — never write to it except a disposable test disk in your own lab, never your main disk |
+| `cat /proc/cpuinfo` | CPU info, read-only |
+| `/proc`, `/sys` writes | Don't "tune" them unless a trusted guide says exactly what, why, and how to undo it |
+
+Read-only for normal users, write only where root genuinely needs it.
+
+## 4. Paths — absolute vs relative
+
+```mermaid
+flowchart TD
+    A[Absolute<br/>starts with /<br/>same file, wherever you stand] --> E["/home/your-user/projects/notes.txt<br/>use in scripts, reports, instructions"]
+    B[Relative<br/>no leading /<br/>from where you are now] --> F["From /home/your-user:<br/>projects/notes.txt = same file"]
+```
+
+| Shortcut | Means |
+|---|---|
+| `.` | Here |
+| `..` | Up one folder |
+| `cd -` | Back to previous folder |
+| `~` | Your home folder |
+| `$HOME` | Same path, as a variable — `echo $HOME` prints it |
+| `~some-user` | That user's home — don't use it to peek into other people's homes |
 
 ```bash
-which python3
-ls -l $(which python3)
-```
-
-`which` shows where a command lives; `$(...)` runs a command and drops its output into the surrounding command. Read the result slowly: path, permissions, owner.
-
-**`/opt` — hand-installed software.** A lab tool installed manually might live in `/opt/toolname`. Note what you installed, when, and why. Untracked software is hard to audit later, and "what is this, who installed it, is it still needed, is it updated?" is a fair audit question for anything sitting here.
-
-**`/boot` — boot files.** Kernel image, bootloader settings. Changing these wrongly can stop a machine from starting. Beginners don't practise here.
-
-**`/dev`, `/proc`, `/sys` — special, virtual folders.** These aren't normal files on disk. They are views into the system, presented as files so normal file tools can read them.
-
-- `/dev/null` discards anything written to it — useful for throwing away output: `command > /dev/null`. `/dev/sda` (name varies) is a disk presented as a file; never write to a disk device directly except on a disposable test disk in your own lab, and never on your main disk.
-- `cat /proc/cpuinfo` shows CPU info, read-only. `ls /proc` shows a folder per PID — one per running process.
-- `/sys` shows hardware and kernel info. Read-only exploration in a lab is fine. Don't change files in `/proc` or `/sys` to "tune" a system unless a trusted guide explains exactly what, why, and how to undo it.
-
-The idea behind all three — everything is a file — is elegant, and it is also why permissions on them matter: read-only for normal users, write only where root genuinely needs it.
-
-## Paths: absolute, relative, home
-
-An absolute path starts with `/` and means the same file no matter where you are standing: `/home/your-user/projects/notes.txt`. Use absolute paths in scripts, reports, and instructions to someone else, where precision matters.
-
-A relative path doesn't start with `/` and means "from where I am now". From `/home/your-user`, `projects/notes.txt` is `/home/your-user/projects/notes.txt`. `..` goes up one folder, `.` means here, and `cd -` goes back to the previous folder you were in.
-
-```bash
 pwd
-cd ~/lab-test
-pwd
-cd ..
-pwd
-cd -
-pwd
+cd ~/lab-test; pwd
+cd ..; pwd
+cd -; pwd
 ```
 
-The failure mode here is boring and common: using a relative path while standing in a different folder than you thought, then creating or deleting the wrong file. The fix is just as boring and just as effective — run `pwd` and `ls -l` before any create, move, or delete, especially in a fresh terminal.
+**Watch out:** a relative path in the wrong folder creates or deletes the wrong file. Run `pwd` and `ls -l` before any create, move, or delete, especially in a fresh terminal.
 
-`~` is your home folder, and `$HOME` is a variable holding the same path. `echo $HOME` prints it. `~some-user` means that user's home, if you are allowed to see it in a lab — don't use it to peek into other people's homes.
-
-## Permissions, in full
-
-This is the section to get fluent in, not just to read. Break every permission string into owner, group, and others until it is automatic.
-
-Run this on your own machine:
-
-```bash
-ls -l ~/lab-test/test.txt
-```
-
-Example output (yours will differ):
+## 5. Read an `ls -l` line
 
 ```
--rw-r--r-- 1 your-user your-user 38 Nov  1 12:00 /home/your-user/lab-test/test.txt
+-rw-r--r-- 1 your-user your-user 38 Nov  1 12:00 test.txt
+ │ │   │   │
+ │ │   │   └── others: r--
+ │ │   └────── group: r--
+ │ └────────── owner: rw-
+ └──────────── type: - = file, d = folder, l = link
 ```
 
-Left to right: `-` is the type (regular file; `d` is a directory, `l` is a link), then `rw-` is owner, `r--` is group, `r--` is others, then link count, owner user, owner group, size in bytes, last change time, and name.
+Then: link count · owner user · owner group · size in bytes · last change time · name.
 
-So `-rw-r--r--` means: a file, owner can read and write, group and others can read only. No `x` for anyone, which is right for a text file — it isn't a program.
-
-For a folder:
+Folder example:
 
 ```
 drwxrwxr-x 2 your-user your-user 4096 Nov  1 12:00 lab-test
 ```
 
-`d` is a directory, owner rwx, group rwx, others r-x. That is `775` in numbers, below.
+`d` = directory, owner `rwx`, group `rwx`, others `r-x` — that's `775` (§6).
 
-### What r, w, x mean — and why folders differ
+## 6. Permissions — letters, folders, numbers
 
-| Letter | For a file | For a folder |
-|--------|------------|--------------|
-| r | Read the content | List names inside |
-| w | Change the content | Create, delete, rename files inside |
-| x | Run it as a program | Enter the folder and reach files inside |
+| Letter | File | Folder |
+|---|---|---|
+| `r` (4) | Read content | List names inside |
+| `w` (2) | Change content | Create, delete, rename inside |
+| `x` (1) | Run as a program | Enter the folder, reach files inside |
 
-Two nuances catch almost everyone. First, for a folder you need `x` to enter it, even if you have `r`. Without `x`, you can't reach files inside even if you know their names. Second, deleting a file depends on write permission on the folder, not just on the file. You can delete a file you can't write to, if the folder lets you. Test both in a lab with a test folder — the experiment teaches it faster than any table.
+Two catches, test both in a lab:
 
-### Numbers: how the octal actually works
+```mermaid
+flowchart LR
+    A[Folder r, no x] --> B[Can list names<br/>can't reach files inside]
+    C[Folder w] --> D[Controls delete<br/>even of a file you can't write to]
+```
 
-r=4, w=2, x=1, and `-`=0. Add per group:
+| Number | Letters | Good for |
+|---|---|---|
+| `600` | `rw-------` | Private file, personal test notes |
+| `644` | `rw-r--r--` | Ordinary public text file, README |
+| `755` | `rwxr-xr-x` | Program or folder everyone uses, only owner changes |
+| `775` | `rwxrwxr-x` | Shared project folder for a controlled group |
+| `777` | `rwxrwxrwx` | Almost never — disposable test folder, minutes only, test data only, changed back after |
 
-- `rwx` = 7, `rw-` = 6, `r-x` = 5, `r--` = 4, `---` = 0
+Math: `r=4, w=2, x=1, -=0`, added per group. `rwx=7, rw-=6, r-x=5, r--=4, ---=0`.
 
-Combine the three groups: `rwxrwxr-x` is 7, 7, 5 — **775**. `rw-r--r--` is **644**. `rw-------` is **600**. `rwxr-xr-x` is **755**.
+**Watch out:** `chmod 777` to silence "permission denied" opens the file to everyone. Real fix: `ls -l` (owner?) → `whoami`, `groups` (who are you?) → the one permission actually needed → change only that, for only that group, to the minimum that works. Then check folder permissions too — you need `x` to enter, `w` to create or delete inside.
 
-What the common numbers mean in practice:
-
-| Number | Meaning | Good for | Watch out |
-|--------|---------|----------|-----------|
-| 600 | Owner read/write only | Private file, personal test notes in a lab | A service that needs to read it will fail — fix the design, don't just open it up |
-| 644 | Owner read/write, everyone else read | Ordinary public text file, README | Too open if the file holds anything private |
-| 755 | Owner full, everyone else read and enter | Program or folder everyone should use but only the owner changes | Folder 755 doesn't protect the files inside — check those too |
-| 775 | Owner and group full, others read and enter | Shared project folder for a controlled group in a lab | Too open if the group is large or includes people who shouldn't change files |
-| 777 | Everyone full | Almost never. A disposable test folder, for minutes, with test data only, changed back after | Almost always a finding: anyone can change or delete |
-
-Watch out for the classic shortcut: a program says "permission denied" and someone runs `chmod 777` to make it go away. That fixes the symptom by opening the file to everyone. The real fix, in your own lab, is to check who owns the file (`ls -l`), check who you are (`whoami`, `groups`), work out the one permission you actually need — read, write, or enter — and change only that, for only that group, to the minimum that works. Then test again. If it still fails, check the folder permissions too: you need `x` to enter a folder and `w` on it to create or delete inside.
-
-### Changing permissions safely
-
-Test files only, own machine only:
+## 7. Change permissions safely
 
 ```bash
 mkdir -p ~/lab-test
 echo "test" > ~/lab-test/a.txt
 ls -l ~/lab-test/a.txt
-chmod 600 ~/lab-test/a.txt
-ls -l ~/lab-test/a.txt
-chmod 644 ~/lab-test/a.txt
-ls -l ~/lab-test/a.txt
+chmod 600 ~/lab-test/a.txt; ls -l ~/lab-test/a.txt
+chmod 644 ~/lab-test/a.txt; ls -l ~/lab-test/a.txt
 ```
 
-Always `ls -l` before and after. That before-and-after habit is the audit habit.
+Always `ls -l` before and after. That's the audit habit.
 
-Symbolic form is also worth knowing: `chmod u+x file` adds execute for the owner, `chmod g-w file` removes write for the group, `chmod o-r file` removes read for others. `u` is owner, `g` is group, `o` is others, `a` is all.
+| Form | Means |
+|---|---|
+| `chmod u+x file` | Add execute, owner |
+| `chmod g-w file` | Remove write, group |
+| `chmod o-r file` | Remove read, others |
+| `u / g / o / a` | Owner / group / others / all |
 
-`chown` changes who owns a file. Normally only root can hand ownership to another user, and doing it wrong can lock the original owner out. Understand the concept — owner matters because owner permissions apply to the owner — but don't practise `chown` on system files.
+| Command | Changes | Note |
+|---|---|---|
+| `chmod` | Permissions (mode) | Test files only, own machine only |
+| `chown` | Who owns a file | Normally root only; wrong use can lock the original owner out — understand it, don't practise it on system files |
+| `umask` | Defaults for new files | Files start 666, folders 777, umask subtracts |
 
-`umask` sets the defaults for new files. Roughly, it subtracts from the maximum: files start at 666, folders at 777, and the umask removes some. With a umask of `022`, new files come out 644 and new folders 755. With `077`, new files are 600 and folders 700 — the private-work default. Check yours with `umask` in a lab, create a test file, and see the effect with `ls -l`. Choose by design, private versus shared, not by habit.
+| `umask` | New file | New folder |
+|---|---|---|
+| `022` | `644` | `755` |
+| `077` | `600` | `700` — private-work default |
 
-### Why ownership matters for red teaming
+Check yours: `umask`, create a test file, `ls -l` it. Choose private vs shared by design, not habit.
 
-A root-owned file at 644 can be read by everyone but changed only by root — sound design for a system file everyone needs to read. A service-owned file at 600 can be touched only by that service — sound design for private service data. A group-owned folder at 775 lets a controlled group work together while others only look in. The audit question is always the same: is this file owned by the right user, in the right group, at the minimum permission its purpose needs? A private file at 644, or a system file writable by everyone, is a finding, with a fix: tighten to the minimum and ask why it was open in the first place.
+Ownership, in one line each:
 
-## Auditing a filesystem, the way it actually goes
+```mermaid
+flowchart LR
+    A[Root-owned, 644] --> B[Everyone reads<br/>only root changes]
+    C[Service-owned, 600] --> D[Only that service touches it]
+    E[Group-owned, 775] --> F[Controlled group works<br/>others only look in]
+```
 
-This is what the System Audit project does in code — system info, permission checks with `os.stat`, localhost ports, a saved report. The manual version, on your own project folder only, goes like this:
+Audit question: right owner, right group, minimum permission for its purpose? Private file at `644`, or system file writable by everyone, is a finding — tighten to the minimum and ask why it was open.
 
-Identify where you are and who you are — `pwd`, `whoami`, `ls -l`. Don't audit a folder you don't own or a system folder you don't understand yet without a guide.
+## 8. Audit a folder — the flow
 
-List the folder itself with `ls -ld <folder>` and its contents with `ls -l <folder>`. Note type, owner, group, permission number, and size for each item.
+```mermaid
+flowchart TD
+    A[1 · Where + who<br/>pwd · whoami · ls -l] --> B[2 · Folder itself<br/>ls -ld folder]
+    B --> C[3 · Contents<br/>ls -l folder]
+    C --> D[4 · Each item: 3 questions<br/>who reads? who changes? who must not?]
+    D --> E[5 · Ownership + risk patterns]
+    E --> F[6 · Short report<br/>date · folder · findings · fix ideas]
+```
 
-Work through permissions one by one and ask the three design questions each time: who needs to read this, who needs to change this, who should not? Anything wider than needed goes in the report as a lab finding with a fix idea — for example, a test file holding private test notes at 644 becomes `chmod 600`, because only the owner needs it.
+Risk patterns to note, not delete on sight:
 
-Check ownership: is the owner and group right for the file's purpose? A system file owned by a normal user in a lab is unusual and worth asking about.
+| Pattern | Finding |
+|---|---|
+| Anything at `777` | Anyone can change or delete |
+| Private file at `644` or wider | Fix: `chmod 600` |
+| Folder writable by others, shouldn't be | Tighten to the group that needs it |
+| File you don't recognise | Note it, learn what it is from documentation, then decide |
 
-Then check the risk patterns: anything at 777, any private file at 644 or wider, any folder writable by others that shouldn't be, any file you don't recognise. Don't delete the unknown file on sight — note it, learn what it is from documentation, then decide.
+Write the report in your lab folder, strip private details before sharing anything, then explain it out loud without reading it word for word. A finding you can't explain, you haven't understood yet.
 
-Write it up as a short report in your lab folder — date, folder audited, findings, fix ideas — and strip private details before sharing or publishing anything. Then explain the report out loud in a few minutes without reading it word for word: what you audited, what you found, what the risk is in lab terms, and what the fix is. If you can't explain a finding, you haven't understood it yet.
+Hidden files: a name starting with `.` is hidden from plain `ls`, not secret, not protected. Shell settings live in dotfiles in your home; `ls -a` shows them.
 
-A few lab habits worth keeping: practise deletes only in `~/lab-test` with files you just listed, never `rm -rf /` or `rm -rf ~`, and never store important work in `/tmp`. `/tmp` is temporary by design; important work lives in `/home`, backed up or pushed to Git for projects.
-
-## A quick lab pass
-
-Work through this once, slowly, on your own machine, and most of the file above stops being theory:
+## 9. Lab pass — try it now
 
 ```bash
 ls /
 ls -l /home
 ls -ld ~
-ls -l /etc/hostname
-cat /etc/hostname
+ls -l /etc/hostname; cat /etc/hostname
 ls -l /var/log | head -20
 mkdir -p ~/lab-test/perm
 echo "hello lab" > ~/lab-test/perm/a.txt
 ls -l ~/lab-test/perm/a.txt
-chmod 600 ~/lab-test/perm/a.txt
-ls -l ~/lab-test/perm/a.txt
-chmod 700 ~/lab-test/perm
-ls -ld ~/lab-test/perm
+chmod 600 ~/lab-test/perm/a.txt; ls -l ~/lab-test/perm/a.txt
+chmod 700 ~/lab-test/perm; ls -ld ~/lab-test/perm
 ```
 
-For each step, say out loud what the number means, what the letters mean, and what it allows for owner, group, and others. Explain why 600 is private, why 644 is public-readable, and why 700 on a folder is owner-only. Then try the folder experiment from earlier: set a test folder to 444, try to `cat` a file inside it, note the error, set it to 555, and try again. That one experiment settles the difference between folder read and folder execute better than memorising the table.
+Say out loud for each step: what the number means, what the letters allow for owner, group, others. Then the folder experiment: set a test folder to `444`, try to `cat` a file inside, note the error; set it to `555`, try again. That settles folder read vs folder execute faster than memorising the table.
 
-Hidden files are worth a mention too: a name starting with `.` is just hidden from a plain `ls` listing, not secret and not protected. Your shell settings live in dotfiles in your home folder, and `ls -a` is how you see them. Hidden means "don't clutter the listing", nothing more.
+**Watch out:**
+- Deletes only in `~/lab-test`, files you just listed — never `rm -rf /` or `rm -rf ~`
+- Never important work in `/tmp` — it may vanish on reboot; important work lives in `/home`, backed up or pushed to Git
 
-When you can draw the tree from `/` down with ten or more folders and explain each one, read any `ls -l` line without hesitation, convert letters to numbers and back, explain folder `x` versus folder `r` and why folder `w` controls deletion, and audit your own project folder and explain the report line by line, move on to `linux-commands.md`.
+**Done when you can:** draw the tree from `/` down with 10+ folders and explain each one, read any `ls -l` line without hesitation, convert letters to numbers and back, explain folder `x` vs `r` and why folder `w` controls deletion, and audit your own project folder and explain the report line by line.
+
+Next → `linux-commands.md`
 
 ---
-
 *Lab only: systems you own or have written permission to test, test data only. Permissions check only for private files — never read shadow data, private keys, or other users' private files.*
