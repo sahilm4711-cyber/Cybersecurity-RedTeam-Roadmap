@@ -1,55 +1,90 @@
-# Tracking Progress Honestly
+# Tracking Progress Honestly — Visual Notes
 
-Progress in this roadmap is easy to fake and hard to measure, which is why it needs its own way of thinking. You can spend months reading, watching, and running commands, and feel busy the whole time, without getting much better. Or you can spend far less time, in focused lab sessions, and actually improve. The difference is not effort. It is proof — and being honest about what counts as proof.
+Lab only · own machine / own lab only · test data only
 
-Lab only, as always. Your own machine, your own private lab, test data only, generic placeholders like your-user and <test-password> in every note. Nothing here is a reason to test a real system to make progress look better.
+Progress is easy to fake. Months of reading and running commands can feel busy without improving you; far less time in focused lab sessions can. The difference isn't effort — it's proof.
 
-## What counts as proof
+## 1. What counts as proof — only three kinds
 
-Three kinds of evidence are worth trusting, because each one is hard to fake.
+| Proof | What it looks like |
+|---|---|
+| Lab task from memory | Do it now, without looking, with a small change from the practised version — different lab folder, test file, or port on your own machine — result matching what you expected before starting |
+| Short write-up, your own words | A few paragraphs after a lab task: setup in generic terms · what you tried · what you found · what you'd fix or do differently — and you can explain it aloud without reading it word for word |
+| Fixed lab flaw | Found something wrong in your own lab — folder too open, service listening where it shouldn't, test password rightly called weak — fixed it, checked the fix, wrote down what changed |
 
-The first is a lab task done from memory. Not a task you followed step by step from a page, and not a task you did once last month and remember fondly. A task you can sit down and do now, without looking, with a small change from the version you practised — a different lab folder, a different test file, a different port on your own machine. If you can do it, with the result matching what you expected before you started, that is skill. If you can only do it with the page open, that is familiarity, and familiarity is the stage before skill, not a substitute for it.
+Page-open doing is familiarity, not skill. Anyone can paste output; explaining it is the work, and the sentence you can't finish is your next practice question. No one of these three for a topic means it isn't finished yet — practise it from memory, write the explanation, or find and fix a flaw.
 
-The second is a short write-up in your own words. A few paragraphs, written after a lab task, explaining what the setup was in generic terms, what you tried, what you found, and what you would fix or do differently. A write-up you can explain out loud, without reading it word for word, is stronger proof still. Writing forces the gaps out: the sentence you cannot finish is the part you do not understand yet, and that sentence is your next practice question. A write-up full of pasted tool output, by contrast, proves very little. Anyone can paste output. Explaining it is the work.
+## 2. Review at three scales
 
-The third is a fixed lab flaw. You found something wrong in your own lab setup — a folder with permissions too open, a lab service listening where it should not be, a test password your checker rightly called weak — and you fixed it, checked the fix, and wrote down what changed. That is a complete loop: find, understand, fix, verify. A loop like that, done honestly in your own lab, is worth more than a dozen topics skimmed. It is also the closest thing in this roadmap to real red team work, which is, at its core, finding a weakness, understanding it, and showing the fix clearly.
+| Scale | Do | Answers |
+|---|---|---|
+| Daily | Re-read today's note; write tomorrow's one question in a single sentence | Did I do the one thing planned? Did the result match expectations? Where did I get stuck? |
+| Weekly | Re-read the week's notes in ~20 minutes; summary — learned · practised · failed · stayed · next | What actually happened vs planned? Which sessions produced proof? Is the same failure recurring? |
+| Monthly | Redo one last-month task from memory, small change; explain one topic without looking | What stayed, what faded? Unexplainable topics go back to practice, not reading. |
 
-If you cannot point to one of these three for a topic, you have not finished that topic yet, however long you spent on it. That is not a judgement. It is useful information, because it tells you exactly what to do next: practise the task from memory, write the explanation, or find and fix a flaw in the lab.
+**Watch out:** counting is a trap. Pages read, tools run, hours sat at the desk feel objective and are mostly noise — hours sat down is not hours learned, tools run with the page open is not tools understood. Count proof instead: tasks from memory, write-ups explainable without notes, lab flaws found and fixed. That number is smaller and honest, which is why it's useful.
 
-## Daily, weekly, and monthly review
+## 3. Busy-work vs real progress
 
-Review works best at three scales, and each scale answers a different question.
+| Busy-work — feels productive, leaves nothing | Real progress — slower, leaves something |
+|---|---|
+| Re-reading a file already read; re-running a task with the same easy test data | Getting stuck, writing down exactly where, fixing that specific piece |
+| Collecting another tool without understanding the last one | Changing one variable and watching what breaks |
+| Watching a walkthrough without touching the lab | Writing an explanation, finding a sentence you can't finish, practising that gap until you can |
 
-Daily review is small and immediate. At the end of the day, re-read today's short practice note and ask: did I do the one thing I planned, did the result match what I expected, and where did I get stuck? Then write tomorrow's one question in a single sentence. That is it. Daily review is not a performance appraisal. It is leaving tomorrow's start ready, so you do not lose twenty minutes in the morning deciding what to do.
+Test after any session: can you do or explain something new? If no, it was busy-work, however long it took.
 
-Weekly review is where the week becomes visible. Re-read the week's notes in about twenty minutes and ask what actually happened versus what you planned. Which sessions produced proof — a task from memory, a write-up, a fixed flaw? Which ones were just reading or running commands with the page open? What failed, and is the same failure showing up again? Then write a short weekly summary: what you learned, what you practised, what failed, what stayed, what is next. The summary is the unit that matters, because a week you can summarise honestly is a week you can learn from, and a week you cannot summarise is usually a week that drifted.
+Two quieter signals: note specificity — vague early notes ("learned Linux commands") should become specific (which command, what it showed, what went wrong, what changed); notes staying vague means you're still reading. And polishing — rewriting notes, reorganising folders — fine in small doses, but if it isn't producing proof, it isn't progress; do the lab task first.
 
-Monthly review is wider and slower. Pick one topic from last month and redo a task from it from memory, with a small change. Then explain one topic out loud or in writing, without looking. Whatever you cannot explain goes back to practice, not back to reading. Monthly review is also the right time to look at the shape of things: are you spending your time on the main red team path, or has a supporting topic quietly taken over? Are your write-ups getting clearer, or are they getting longer without getting better? Are you building a small body of work — scripts, notes, write-ups — that you could show someone, or are you mostly collecting finished pages?
+## 4. Progress, phase by phase
 
-Watch out for a common trap in monthly review: counting. It is tempting to measure progress by how many pages you read, how many tools you ran, or how many hours you sat at the desk. Those numbers feel objective, and they are mostly noise. Hours sat down is not hours learned. Tools run with the page open is not tools understood. Count proof instead: how many tasks can you do from memory, how many write-ups can you explain without notes, how many lab flaws have you found and fixed. That number will be smaller, and it will be honest, which is why it is useful.
+Judge each phase by proof, not pages.
 
-## Busy-work versus real progress
+| Phase | Done means you can, from memory, in your own lab |
+|---|---|
+| Fundamentals + Linux | Explain CPU, RAM, disk, OS, kernel, shell, file, user, group — and run the 5-check box sizing (identity, map, permissions, processes + ports, logs + drawing) against a baseline |
+| Networks | Explain what a packet's journey proves and doesn't prove; separate localhost-only from exposed ports on your own machine and justify each exposed one |
+| Web | Explain a request/response in plain terms and the OWASP ideas at lab level, with a localhost-only example, placeholders only |
+| Tools | For each tool claimed: what it does, what its output means, where it misleads you — one tool understood beats ten run with copied flags |
+| Passwords + systems | Check a password on test data and explain where its verdict is wrong; audit your own machine against a baseline, act on one finding, re-check it, summarise with placeholders only |
+| Practice | Produce the three proofs regularly, plus a weekly summary you can defend |
 
-Busy-work has a particular feel once you learn to recognise it. It feels productive in the moment and leaves nothing behind. Re-reading a file you have already read, re-running a lab task with the same easy test data, collecting another tool without understanding the last one, watching another walkthrough without touching the lab — all of these feel like work, and none of them produce proof. The test is simple: after the session, can you do something you could not do before, or explain something you could not explain before? If the answer is no, the session was busy-work, however long it took.
+A phase you can only repeat from reading, or run page-open, is still in progress — return to the specific failing piece, small to small. Notes gone vague → specific plus at least one proof means you can build on it.
 
-Real progress is usually slower and less comfortable. It involves getting stuck, writing down exactly where, and going back to fix that specific piece. It involves changing one variable and watching what breaks. It involves writing an explanation, discovering you cannot finish a sentence, and practising that gap until you can. None of that feels as smooth as re-reading a familiar page, and all of it leaves something behind — a note, a script, a fix, an explanation.
+## 5. Restarting after a missed week — or month
 
-Another honest signal is whether your notes are getting more specific over time. Early notes are vague: "learned Linux commands." Later notes should be specific: which command, what it showed on your own machine, what you got wrong, what you changed. If your notes stay vague month after month, you are probably staying at the reading stage. Specificity is a side effect of doing, and its absence is a side effect of not doing.
+A missed week isn't a disaster; it only becomes one if it turns into a missed month. The way back is deliberately small.
 
-There is also a quieter form of busy-work worth naming: polishing. Rewriting the same note, reorganising the same folder, redesigning a roadmap page, tweaking a profile — all fine in small doses, and all capable of eating a whole evening that was meant for lab work. If the polishing is not producing proof, it is not progress. Do the lab task first, and let the polishing wait until the proof exists.
+```mermaid
+flowchart TD
+    A[Re-read last weekly summary<br/>5 minutes, not the whole roadmap] --> B[Redo one last-week task<br/>from memory, small change]
+    B --> C[Fresh note<br/>what stayed · what faded]
+    C --> D[One main topic this week<br/>one sentence · start small to small]
+```
 
-## Restarting after a missed week
+| Gap | Restart |
+|---|---|
+| Missed week | Summary → one from-memory task → fresh note → this week's one topic. Don't cram two weeks into one, don't restart from the beginning — both feel serious and both usually end in burnout and another missed week. |
+| Missed month | Re-read the overview, pick your best-known topic, redo one task from it, then one new topic for the week. Small starts are how long plans survive real life; big restarts are how they die. |
 
-A missed week is not a disaster. It is a normal part of a year-long plan, and it only becomes a problem if it turns into a missed month. The way back is small, and deliberately so.
+Note a gap's reason plainly — exams, family, health, travel — as fact, not excuse or guilt. Over a year, what matters is coming back quickly, without drama, every time.
 
-Start by re-reading your last weekly summary, not the whole roadmap. Five minutes is enough to remind yourself where you were. Then redo one task from last week from memory, with a small change, in your own lab. It does not need to be the hardest task, or the most impressive one. It needs to be a task you once could do, done again, so your hands and your memory reconnect with the work. Write a fresh short note about what stayed and what faded. That note is the bridge: it tells you, honestly, what survived the gap and what needs re-practising.
+## 6. Final check — three questions, any time
 
-Then pick one main topic for this week, in a single sentence, and start small to small again. Do not try to catch up by cramming two weeks of practice into one week, and do not restart from the beginning and re-read everything. Both of those feel like taking the miss seriously, and both usually end in burnout and another missed week. One block a day, one question a day, with a note at the end, is enough to be moving again. Momentum returns faster than you expect once the first few blocks are done, because the skill was not erased by a week away — it faded at the edges, and a few focused sessions sharpen it again.
+```mermaid
+flowchart LR
+    A[Task from memory?] --> B[Explain it without looking?]
+    B --> C[Show a write-up or fixed flaw?]
+    C --> D[All yes = progressing]
+```
 
-If the missed week had a reason — exams, family, health, travel — write that down, plainly, in the note. Not as an excuse, and not as guilt, but as a fact. A record that says you missed a week because of exams and restarted with one block a day is a record you can trust. A record that pretends the week did not happen is not. Over a year, the pattern that matters is not whether you missed weeks. It is whether you came back, quickly and without drama, every time.
+| # | Ask yourself |
+|---|---|
+| 1 | Can I do a recent lab task from memory, with a small change, and does the result match what I expected? |
+| 2 | Can I explain a recent topic in plain English, without looking, in a few minutes? |
+| 3 | Can I show a short write-up, or a fixed lab flaw, from the last few weeks, that I actually understand? |
 
-The same rule holds if the gap stretches longer. A missed month is not a reason to start over. It is a reason to re-read the overview, pick one topic you know best, redo one task from it, and then pick one new topic for the week. Small starts are how long plans survive real life. Big restarts are how they die.
+All three yes: you're progressing. Any one no: that's your next practice.
 
-## A final check, kept simple
-
-At any point, you can ask yourself three questions, and the answers will tell you where you stand. Can I do a recent lab task from memory, with a small change, and does the result match what I expected? Can I explain a recent topic in plain English, without looking, in a few minutes? Can I show a short write-up, or a fixed lab flaw, from the last few weeks, that I actually understand? If the answer to all three is yes, you are progressing, even if the pace feels slow. If the answer to one of them is no, you know exactly what to practise next. That is the whole system: proof, review, honest notes, and a small restart whenever life interrupts. It is not glamorous, and it is what works.
+---
+*Lab only: systems you own or have written permission to test, test data only.*
