@@ -23,7 +23,7 @@ Think of Linux filesystem as a building with one entrance:
   Each folder has a purpose, designed by Linux itself. You do not invent new top-level folders for fun — you use the designed rooms for their designed purpose.
 
 - **Papers = files.**
-  Files live in rooms. A file's full path is its address in the building: `/home/professor/projects/notes.txt` means: entrance -> home room -> professor room -> projects room -> notes.txt paper.
+  Files live in rooms. A file's full path is its address in the building: `/home/your-user/projects/notes.txt` means: entrance -> home room -> your-user room -> projects room -> notes.txt paper.
 
 - **Keys = permissions.**
   Each room and each paper has keys: who can read it, who can change it, who can enter the room. Permissions are the key system of the building.
@@ -42,7 +42,7 @@ When you later audit a system, you are really checking: "Is this separation stil
 | Folder | Simple meaning | What lives there | Example |
 |--------|----------------|------------------|---------|
 | `/` | Root, top of everything | All other folders | `ls /` shows all top folders |
-| `/home` | Users' personal folders | Each user's home, like `/home/professor` | Your projects, notes, test files |
+| `/home` | Users' personal folders | Each user's home, like `/home/your-user` | Your projects, notes, test files |
 | `/root` | Root user's home | Root's personal files only, not for normal users | Only root can normally enter |
 | `/etc` | System settings | Settings files for system and services | `/etc/hostname`, `/etc/passwd` (see note below) |
 | `/var` | Changing data | Logs, caches, service data that changes often | `/var/log` — system logs |
@@ -72,7 +72,7 @@ Now, detail for each important folder, one by one. Do not rush this section — 
 
 ### 3.2 `/home` — Users' homes
 
-- **What:** Each normal user gets a folder here. Example: user `professor` gets `/home/professor`. That is your personal room in the building.
+- **What:** Each normal user gets a folder here. Example: user `your-user` gets `/home/your-user`. That is your personal room in the building.
 - **What lives there:** Your documents, projects, notes, downloads, settings for your user only (hidden files starting with `.`, like `.bashrc`).
 - **Example lab commands (own machine only):**
   ```bash
@@ -80,9 +80,9 @@ Now, detail for each important folder, one by one. Do not rush this section — 
   ls -l ~
   pwd
   ```
-  `~` means "my home folder". `pwd` shows where you are now. If you are in `/home/professor`, `pwd` prints that path.
+  `~` means "my home folder". `pwd` shows where you are now. If you are in `/home/your-user`, `pwd` prints that path.
 - **What if you change it:** Your home is yours to organise in lab. Create `projects`, `notes`, `lab-test` here. Do not delete another user's home, and do not enter another user's home without permission.
-- **Security note:** Home folders should not be readable by everyone if they contain private notes or keys. Check with `ls -ld /home/professor` in your own lab, and understand what the permission letters mean (Section 5).
+- **Security note:** Home folders should not be readable by everyone if they contain private notes or keys. Check with `ls -ld /home/your-user` in your own lab, and understand what the permission letters mean (Section 5).
 
 ### 3.3 `/root` — Root's home
 
@@ -193,7 +193,7 @@ The idea of "everything is a file" in Linux is powerful: devices, processes, and
 
 Starts with `/`, means "from the root, exactly this address".
 
-Example: `/home/professor/projects/notes.txt`
+Example: `/home/your-user/projects/notes.txt`
 - No matter where you are now, this path means the same file.
 - Use absolute paths when you want to be precise, in scripts, in reports, and when giving instructions to someone else.
 
@@ -201,10 +201,10 @@ Example: `/home/professor/projects/notes.txt`
 
 Does NOT start with `/`, means "from where I am now".
 
-Example: If you are in `/home/professor`, then:
-- `projects/notes.txt` means `/home/professor/projects/notes.txt`
-- `../` means "go up one folder" — from `/home/professor/projects`, `../` means `/home/professor`
-- `./` means "here, current folder" — `./notes.txt` in `/home/professor` means `/home/professor/notes.txt`
+Example: If you are in `/home/your-user`, then:
+- `projects/notes.txt` means `/home/your-user/projects/notes.txt`
+- `../` means "go up one folder" — from `/home/your-user/projects`, `../` means `/home/your-user`
+- `./` means "here, current folder" — `./notes.txt` in `/home/your-user` means `/home/your-user/notes.txt`
 - `..` twice: `../../` means go up two folders.
 
 **Lab example — own machine only:**
@@ -228,7 +228,7 @@ What each means:
 ### 4.3 Home shortcut `~` and variables
 
 - `~` = your home folder. `~/notes.txt` = `/home/<your-user>/notes.txt`.
-- `~professor` (example) = home folder of user `professor`, if you are allowed to see it in lab. Do not use this to peek into other users' homes without permission.
+- `~your-user` (example) = home folder of user `your-user`, if you are allowed to see it in lab. Do not use this to peek into other users' homes without permission.
 - `$HOME` is a variable that holds your home path. `echo $HOME` prints it. Variables are covered deeper in Linux commands file, but remember: `~` and `$HOME` usually mean the same place for you.
 
 ---
@@ -246,7 +246,7 @@ ls -l ~/lab-test/test.txt
 
 Example output (yours may differ):
 ```
--rw-r--r-- 1 professor professor 38 Oct 31 12:00 /home/professor/lab-test/test.txt
+-rw-r--r-- 1 your-user your-user 38 Oct 31 12:00 /home/your-user/lab-test/test.txt
 ```
 
 Break it, left to right:
@@ -255,8 +255,8 @@ Break it, left to right:
 - `r--` (next 3) = group permissions.
 - `r--` (last 3) = others permissions.
 - `1` = number of links (for files, usually 1; for folders, more — not critical for beginners).
-- `professor` = owner user.
-- `professor` = owner group.
+- `your-user` = owner user.
+- `your-user` = owner group.
 - `38` = size in bytes.
 - `Oct 31 12:00` = last change time.
 - Path = file name and location.
@@ -267,7 +267,7 @@ So `-rw-r--r--` means:
 
 For a folder, example:
 ```
-drwxrwxr-x 2 professor professor 4096 Oct 31 12:00 lab-test
+drwxrwxr-x 2 your-user your-user 4096 Oct 31 12:00 lab-test
 ```
 - `d` = directory.
 - `rwx` owner = read, write, execute. For a folder, execute means "enter the folder and access files inside it".

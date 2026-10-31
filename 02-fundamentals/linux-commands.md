@@ -63,9 +63,9 @@ These three are your navigation system. You will use them every day, in every la
   ```
   Example output (yours will differ by username and folder):
   ```
-  /home/professor
+  /home/your-user
   ```
-  Meaning: You are in `/home/professor`. That is your home folder.
+  Meaning: You are in `/home/your-user`. That is your home folder.
 - **Common mistake:** Skipping `pwd` and assuming you are in the right folder, then deleting the wrong file. Fix: `pwd` first, every time, especially in a new terminal.
 
 ### 1.2 `ls` — List
@@ -89,13 +89,13 @@ These three are your navigation system. You will use them every day, in every la
   - `ls -ld ~/lab-test` = details of the folder *itself*, not files inside it. `d` = directory itself. Use this to check a folder's own permissions, not its contents.
 - **Output meaning — reading one `ls -l` line (full detail is in `linux-filesystem.md`):**
   ```
-  -rw-r--r-- 1 professor professor 38 Oct 31 12:00 test.txt
+  -rw-r--r-- 1 your-user your-user 38 Oct 31 12:00 test.txt
   ```
   - `-` = regular file (not folder).
   - `rw-` = owner: read + write.
   - `r--` = group: read only.
   - `r--` = others: read only.
-  - `professor professor` = owner user, owner group.
+  - `your-user your-user` = owner user, owner group.
   - `38` = size in bytes.
   - `test.txt` = name.
 - **Common mistakes:**
@@ -122,7 +122,7 @@ These three are your navigation system. You will use them every day, in every la
   ```
   Meaning:
   - `cd ~/lab-test` = go to lab-test folder in your home. `~` = home.
-  - `cd ..` = go up one folder. From `/home/professor/lab-test`, `..` goes to `/home/professor`.
+  - `cd ..` = go up one folder. From `/home/your-user/lab-test`, `..` goes to `/home/your-user`.
   - `cd -` = go back to previous folder you were in. Useful when you jump between two folders.
   - `cd ~` = go to home folder.
   - `cd` alone (no argument) = also go to home folder, same as `cd ~`.
@@ -423,7 +423,7 @@ Full permission theory is in `linux-filesystem.md`. Here is the command practice
   id
   groups
   ```
-  Output meaning: `whoami` is one word, your username. `id` shows `uid` (user ID), `gid` (group ID), `groups` list. If a file is owned by group `professor` and you are in group `professor`, group permissions apply to you. If not, others permissions apply.
+  Output meaning: `whoami` is one word, your username. `id` shows `uid` (user ID), `gid` (group ID), `groups` list. If a file is owned by group `your-user` and you are in group `your-user`, group permissions apply to you. If not, others permissions apply.
 - **Common mistake:** Debugging permissions without checking `whoami` first, and assuming you are root or another user. Fix: `whoami` first, then `ls -l` file, then compare owner/group to you.
 
 ---

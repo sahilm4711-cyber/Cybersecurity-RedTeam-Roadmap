@@ -81,7 +81,7 @@ Examples of files:
 
 Every file has:
 - **Name:** How you refer to it, like `notes.txt`.
-- **Path:** Where it lives, like `/home/professor/notes.txt`. Path = address of the file.
+- **Path:** Where it lives, like `/home/your-user/notes.txt`. Path = address of the file.
 - **Type:** Text, program, image, etc. Linux does not force a type from the name alone, but names help humans.
 - **Size:** How much disk space it uses, in bytes.
 - **Owner and group:** Who owns it, and which group it belongs to.
@@ -92,10 +92,10 @@ Every file has:
 
 A folder is a special file that contains a list of other files and folders.
 
-Think of folders as rooms in a building, and files as papers in those rooms. A path like `/home/professor/projects/notes.txt` means:
+Think of folders as rooms in a building, and files as papers in those rooms. A path like `/home/your-user/projects/notes.txt` means:
 - Start at root `/`
 - Go into `home`
-- Go into `professor`
+- Go into `your-user`
 - Go into `projects`
 - Find file `notes.txt`
 
@@ -193,7 +193,7 @@ You already used this in your System Audit project. That project is a practical 
 
 Full detail is in `linux-filesystem.md`. Here is the short, essential version you need before that file:
 
-- **User:** A person or a service account that can log in and run programs. Examples: `professor` (a human user in lab), `postgres` (a service account for a database, in lab).
+- **User:** A person or a service account that can log in and run programs. Examples: `your-user` (a human user in lab), `postgres` (a service account for a database, in lab).
 - **Group:** A collection of users. Permissions can be given to a group at once, instead of to each user one by one.
 - **Root / Administrator:** The superuser on Linux is called `root`. Root can do almost anything. That is why you must be careful with root: a mistake as root can break a system, and a lab service running as root has high impact if it has a problem.
 - **Permissions, in one line:** For each file, three groups get three rights:
