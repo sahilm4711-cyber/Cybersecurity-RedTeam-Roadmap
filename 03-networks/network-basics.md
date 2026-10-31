@@ -1,458 +1,148 @@
-# 03 — Networks: Network Basics, Fully Explained
+# Networks: Network Basics
 
-## What this file is
+This is the map everything else hangs off. Web, tools, Active Directory, lab work — all of it assumes you already know how two machines find each other, talk, and decide what to trust. If you can't draw your own lab network from memory, you don't have the map yet. Tools won't fix that.
 
-This is Phase 2, part 1. You already know computers and Linux. Now you learn how computers talk to each other.
+One rule covers the whole file: your own machine, your own private lab, nothing else. No scanning, sweeping, or probing networks you don't own. Your Kali box and a lab VM or two give you everything you need here.
 
-If you can explain this file in simple English, draw a lab network, and check your own machine's network safely, you have the map for everything after it: web, tools, AD, and red-team lab work. Without this map, tools are just noise.
+## The picture to keep in your head
 
-No shortcuts here. Each concept gets: simple explanation, practical design notes, algorithm, lab example on your own machine only, and common mistakes.
+A network is a postal system. The analogy holds up surprisingly far, so use it until it breaks.
 
-**Safety rule for this whole file:**
-All network checks are on your own machine, or your own private lab network, only.
-- Check your own IPs, your own listening ports, your own lab VMs.
-- Never scan, ping-sweep, or test networks, websites, or computers you do not own or do not have written permission to test.
-- Never use network tools on public Wi-Fi, school networks, or company networks to "learn" — that is unauthorised testing, not learning.
+An IP address is a house address. `192.168.1.10` is a private house on a home or lab network. `127.0.0.1` is your own house, this machine only — traffic there never leaves the box.
 
----
+A port is a door in that house, for one service. Port 80 is the plain web door, 443 the encrypted web door, 22 SSH, 5432 PostgreSQL. A machine can have many doors. Some are open because a service is listening, some are shut because nothing is there. The interesting question is never just "which doors are open?" It's "which doors should be open, to whom, and why?"
 
-## 1. A network, in one picture
+The router is the post office at the edge. It moves traffic between your local network and other networks. The switch is the sorter inside the building, delivering traffic to the right machine on the same local network without sending it outside.
 
-Think of a network as a postal system for computers:
+DNS is the phone book. You type `example.com`, DNS returns an IP, and now your machine knows where to send the packet. A packet is one envelope. Data gets split into packets, sent one by one, and reassembled at the other end. TCP resends a lost envelope. UDP doesn't bother — more on that below.
 
-- **Computer = a house.**
-  Each house has an address, so post can reach it.
+Every security question in this phase reduces to that picture: what machines exist in this lab, what doors are open on each, who is allowed through each door, and which doors should be localhost-only or closed entirely. If you can't draw that, stop and draw it.
 
-- **IP address = house address.**
-  Example: `192.168.1.10` is a private house address in a home/lab network. `127.0.0.1` is a special address meaning "this house itself, this computer only".
+## IP addresses
 
-- **Port = a door in the house, for a specific service.**
-  Example: Port 80 = web door, 443 = secure web door, 22 = SSH door, 5432 = PostgreSQL database door (in lab terms).
-  A house can have many doors, some open (service listening), some closed (no service).
+IPv4 is the form you'll see first: four numbers, dots between them, each 0 to 255, like `192.168.1.10`. IPv6 is the longer form. You'll mostly meet it as `::1`, the IPv6 localhost, and as `[::1]:5432` in `ss` output — same meaning as `127.0.0.1:5432`, localhost only.
 
-- **Router = post office / main gate.**
-  It connects your home/lab network to other networks, and decides where post goes next.
+Private ranges live inside home, lab, and office networks and aren't directly reachable from the internet:
 
-- **Switch = internal mail sorter in a building.**
-  It connects computers inside one local network, and delivers post to the right house inside that network, without sending it outside unnecessarily.
+- `10.0.0.0` to `10.255.255.255` — large private networks and labs
+- `172.16.0.0` to `172.31.255.255` — medium private networks
+- `192.168.0.0` to `192.168.255.255` — home networks and small labs
 
-- **DNS = phone book.**
-  You type a name like `example.com`, DNS looks up the IP address for that name, so your computer knows which house to send post to.
+A public IP sits on the outside of your router, facing the internet. The split between private inside and public outside is a deliberate design: inside machines aren't exposed unless a port is deliberately forwarded. Forwarding should be a conscious, documented decision, never an accident.
 
-- **Packet = one envelope in the post.**
-  Data is broken into small packets, sent one by one, and put back together at the destination. If one envelope is lost, TCP will resend it (see Section 4).
+Localhost deserves emphasis because beginners keep misreading it. `127.0.0.1` and `::1` always mean this computer itself. A service bound to localhost can only be reached from that same machine. That's why a database on `127.0.0.1:5432` is a safer default than one on every interface — the door exists, but only you can walk through it.
 
-**Practical design note:**
-Every network security question starts with this picture: Which houses (computers) exist in this lab? Which doors (ports) are open, and why? Who is allowed to come through each door? Which doors should be closed, or localhost-only? If you cannot draw the picture for a lab network, you cannot test it safely or explain it clearly.
-
----
-
-## 2. IP addresses — fully, simply
-
-### 2.1 What is an IP address?
-
-An IP address is a number that identifies a computer on a network, so other computers can send data to it.
-
-IPv4 example, the common form you will see first:
-```
-192.168.1.10
-```
-- Four numbers, separated by dots, each 0 to 255.
-- First numbers often identify the network, last numbers identify the computer inside that network — exact split depends on subnet mask (see Section 2.4, simplified).
-
-IPv6 example, the newer, longer form:
-```
-::1
-```
-- `::1` is IPv6 localhost, same idea as `127.0.0.1` in IPv4: this computer only.
-- You will see `[::1]:5432` in `ss` output for localhost services in IPv6 form. Same meaning as `127.0.0.1:5432`: localhost only, safer.
-
-### 2.2 Private vs public, simply
-
-- **Private IP:** Used inside home/lab/office networks only. Not directly reachable from the whole internet (router protects it, by design).
-  Common private ranges you will see in labs:
-  - `10.0.0.0` to `10.255.255.255` — large private networks, labs, companies.
-  - `172.16.0.0` to `172.31.255.255` — medium private networks.
-  - `192.168.0.0` to `192.168.255.255` — home networks, small labs. Example: `192.168.1.10` is very common at home.
-- **Public IP:** Used on the whole internet, assigned by your internet provider. Your router usually has a public IP on the outside, and private IPs on the inside for your computers. That separation is a security design: inside computers are not directly exposed, unless a door (port) is forwarded on purpose — and forwarding must be a deliberate, understood decision, never an accident in lab.
-- **Localhost:** `127.0.0.1` (IPv4) and `::1` (IPv6) always mean "this computer itself". No network cable, no Wi-Fi needed. A service listening only on localhost can only be reached from that same computer. That is why your PostgreSQL example on `127.0.0.1:5432` was safer: only your own machine could connect to it in lab terms.
-
-### 2.3 How to check your own IP, lab only
+Check your own setup:
 
 ```bash
 ip a
 hostname -I
 ```
 
-What these mean:
-- `ip a` = show all network interfaces and their IPs on your own machine. Interface names like `lo` (loopback, localhost), `eth0` or `wlan0` (wired/Wi-Fi, names vary), are normal.
-- `hostname -I` = show your own machine's IPs, short form, one line.
-- Look for: `lo` with `127.0.0.1`, and your main interface with a private IP like `192.168.x.x` in a home/lab network. That private IP is your lab address, not a public secret to share carelessly, but also not a password — do not post your public IP or lab details publicly without thinking, as a habit.
+`ip a` shows every interface and its addresses. `lo` is loopback, localhost. `eth0` or `wlan0` is usually your wired or wireless interface, though names vary. `hostname -I` gives the short version, one line. Look for `127.0.0.1` on `lo` and a private address on your main interface. Treat even private lab addresses as something you don't paste into public notes without thinking.
 
-**Lab task — own machine only:**
-1. Run `ip a`, note your interfaces and IPs.
-2. Draw: Your computer -> Router -> Internet (for home) OR Your Kali VM -> Private Lab Network -> Lab Server VM (for lab). Label IPs you found (private/lab only, do not share public IP in notes you publish).
-3. Write in notes: Which IP is localhost? Which is private? Which interface is which?
+### Subnets, without the maths drill
 
-### 2.4 Subnet mask and CIDR, simply (not deep maths yet)
+You'll see notation like `192.168.1.10/24`. The `/24` is CIDR notation — it says the first 24 bits identify the network, the rest identify machines inside it. In a `/24`, machines usually share the first three numbers, like `192.168.1.x`, with the last number changing per machine: `.1` might be the router, `.10` your Kali box, `.20` a lab server.
 
-You will see notations like `192.168.1.10/24`. The `/24` is CIDR notation, short for subnet mask.
+A smaller number after the slash means a bigger network with more machines. A bigger number means a smaller network. You don't need to hand-calculate subnets perfectly yet. You need the distinction it encodes: same local network versus a different network reached via the router. That decides whether traffic stays local or goes through the gateway.
 
-Simple idea, without deep maths:
-- `/24` means: first 24 bits identify the network, remaining bits identify computers inside that network.
-- In a `/24` home/lab network, computers usually share first three numbers, like `192.168.1.x`, where `x` changes per computer: `.1` might be router, `.10` your Kali, `.20` your lab server, etc.
-- Smaller number after `/` = larger network, more computers possible. Larger number = smaller network, fewer computers.
-- You do not need to calculate subnets by hand perfectly as a beginner. You need to understand: CIDR tells you which computers are "in the same local network" vs "in a different network, via router". That distinction matters for lab design: local network traffic stays local, other network traffic goes via router.
+For lab design, small and private is the right default. A `/24` private lab network holding only your lab VMs is simple and contained. Don't park vulnerable lab VMs on a large shared network, or on a network with real machines you don't own.
 
-**Practical design note:**
-Lab networks should be small and private by design: a `/24` private lab network, with only your lab VMs inside it, is a good, simple design for learning. Do not put lab vulnerable VMs on a large shared network, or on a network with real computers you do not own.
+## Ports and listening
 
----
+A port is a number, 0 to 65535, naming one service on a machine. IP gets you to the house, port gets you to the door.
 
-## 3. Ports — doors, services, and listening, fully
+The ones worth memorising now: 21 FTP (old, plain, insecure by design), 22 SSH, 23 Telnet (old, don't use it for real work), 25 SMTP, 53 DNS, 80 HTTP, 110 POP3, 143 IMAP, 443 HTTPS, 3306 MySQL, 5432 PostgreSQL. The rest you look up when you meet them. That's the professional habit — common ports in memory, everything else in docs.
 
-### 3.1 What is a port?
+Four words get confused constantly, so get them straight:
 
-A port is a number, 0 to 65535, that identifies a specific service on a computer.
+- **Listening** (from `ss` on your own machine) means a service is waiting on that port. `127.0.0.1:5432` in LISTEN state is a database waiting on localhost.
+- **Open** (from a check against a lab machine you own) means a service answered on that port. Open means present, not vulnerable. The follow-up questions do the real work: what service, what version, should it be open, to whom?
+- **Closed** means the machine answered "no service here." The machine is reachable, the door is shut.
+- **Filtered** means no clear answer, usually a firewall dropping the probe silently. Filtered proves neither open nor closed — it proves you can't tell from outside, which is often the firewall doing its job.
 
-Think: IP address gets you to the right house. Port gets you to the right door/service inside that house.
+Run this audit on every listening port on your own machine, and it will teach you more than any port list:
 
-- **Well-known ports (0-1023):** Reserved for common services, need higher privilege to listen on in traditional design.
-  - 21 = FTP (old file transfer, insecure by design in plain form)
-  - 22 = SSH (secure remote shell)
-  - 23 = Telnet (old, insecure, do not use for real work)
-  - 25 = SMTP (email sending)
-  - 53 = DNS
-  - 80 = HTTP (web, not encrypted)
-  - 110 = POP3 (email receiving, old)
-  - 143 = IMAP (email receiving)
-  - 443 = HTTPS (web, encrypted)
-  - 3306 = MySQL database
-  - 5432 = PostgreSQL database (your lab example)
-- **Registered ports (1024-49151):** For other services, registered but not as universal as well-known.
-- **Dynamic / private ports (49152-65535):** For temporary connections, like when your browser connects out, it uses a temporary high port as its return door.
+What service is this? Should it be running at all in this lab? Should it listen on localhost only, or on all interfaces, and why? Is it patched? If it shouldn't be listening, or shouldn't be exposed, the fix is concrete: stop the service, bind it to localhost, or firewall it.
 
-You do not need to memorise all ports. Memorise the common ones above, and learn to look up others in documentation when you meet them in lab output. That is professional habit: common in memory, rest in docs.
+### TCP versus UDP
 
-### 3.2 Listening, open, closed, filtered — simple meanings
+TCP is a phone call. Connect first, talk, confirm you heard, resend anything lost. The handshake is SYN, then SYN-ACK, then ACK, then data. Web, email, SSH, and databases ride on TCP because every byte has to arrive, in order.
 
-When a tool checks a port in a lab, it can report different states. Understand these words precisely, because beginners confuse them:
+UDP is a postcard. Send it, hope it arrives, no confirmation per packet. DNS queries, streaming, games, and voice ride on UDP because speed matters more than perfect delivery, or the application handles retries itself.
 
-- **Listening (from `ss` on own machine):** A service on your own machine is waiting on that port, ready to accept connections. Example: `ss -tln` shows `127.0.0.1:5432` LISTEN = PostgreSQL service is listening on localhost port 5432.
-- **Open (from a lab scan of a lab target you own):** A service answered on that port. Open means service present, not automatically vulnerable. Next questions: what service, what version, should it be open, to whom?
-- **Closed:** No service answered on that port, but the computer responded "no service here". Closed is different from filtered: closed tells you computer is reachable, but that door is shut.
-- **Filtered:** No clear answer, likely a firewall blocked the check, or dropped it silently. Filtered does not prove open or closed — it proves you cannot tell from outside, which is often a firewall design working as intended.
+Watch out for one habit: UDP has no handshake, so UDP services can be abused for amplification in real attacks. You don't practise that. You learn to recognise UDP services in lab and ask the same audit questions — should this run, should it be exposed.
 
-**Practical design note — the audit question for every listening port:**
-For each listening port on your own machine in lab, ask:
-1. What service is this? (name, version if known in lab)
-2. Should this service be running at all in this lab?
-3. Should it listen on localhost only, or on all networks? Why?
-4. Is it patched/updated in lab terms?
-5. If it should not be listening, or should be localhost-only but is exposed, that is a lab finding, with a fix idea: stop service, or bind to localhost, or firewall it, in lab design.
+`ss -tln` shows TCP listeners, `ss -uln` shows UDP listeners. Both need the same treatment.
 
-That five-question check is more valuable than just listing ports. It is the difference between a tool output and a professional audit.
+## DNS, DHCP, and the journey of a web request
 
-### 3.3 TCP vs UDP — reliable vs fast, simply
+DNS turns names into IPs. You type `example.com`, your machine asks a DNS server, the server answers with an IP — `93.184.216.34` in the classic example — and the connection goes to that IP on port 80 or 443.
 
-- **TCP (Transmission Control Protocol):**
-  - Reliable, ordered, checked delivery. Like a phone call: you connect first, you talk, you confirm you heard, if a word is lost, it is resent.
-  - Used for: web (HTTP/HTTPS), email, SSH, databases — where every piece of data must arrive correctly, in order.
-  - How it works, simply: Three-way handshake to connect (SYN -> SYN-ACK -> ACK), then data, then close. You do not need to memorise handshake packets perfectly yet, just understand: TCP connects first, then talks, then confirms.
-- **UDP (User Datagram Protocol):**
-  - Fast, unchecked, no connection first. Like a postcard: you send it, you hope it arrives, you do not confirm each postcard.
-  - Used for: DNS queries, video streaming, online games, VoIP — where speed matters more than perfect delivery of every single piece, or where the application itself handles retries if needed.
-  - Security note: Because UDP has no connection handshake, UDP services can be abused for amplification in real attacks — that is why understanding UDP matters for defence, but you will not practise UDP attacks. You will practise understanding UDP services in lab, and checking if they should be exposed.
+The record types you'll meet first: A maps a name to an IPv4 address, AAAA to IPv6, CNAME maps a name to another name as an alias, MX points to a mail server, TXT carries text data often used for ownership verification. Learn A, AAAA, and CNAME cold; pick up MX and TXT when they show up in tool output.
 
-**Practical design note:**
-When you see `ss -tln` (TCP listening) vs `ss -uln` (UDP listening, in lab if you try it), remember: TCP listening = service waiting for a connection. UDP listening = service waiting for datagrams, no connection step. Both need the same audit questions: what service, should it run, localhost-only or exposed?
+DNS was built for convenience, not security, and that history matters. Spoofing and poisoning — tricking a machine into accepting the wrong IP for a name — are real concepts, and DNSSEC (signed answers) and DNS over HTTPS (encrypted queries) exist as defences. Learn normal DNS first, then why those defences exist. Don't go testing real DNS servers.
 
----
+DHCP is the automatic part. When a machine joins a network, a DHCP server hands it an IP, a subnet mask, a gateway address, and a DNS server address, for a limited lease time. That's why your Kali VM usually has a private IP without you typing anything — the router handed it one at startup. The flip side, worth knowing early: a rogue DHCP server on a network you don't own could hand out a wrong gateway or DNS server and redirect traffic. Another reason to only join networks you trust, and only run a DHCP server in your own private lab.
 
-## 4. DNS, DHCP, and how a name becomes a connection — step by step
+Now the journey itself. This is the single most useful mental model in the file, because it doubles as a debugging order. When you open a page:
 
-### 4.1 DNS — phone book for the internet, simply
+1. **DNS lookup.** Browser asks for the IP of `example.com`. If DNS fails, the browser says it can't find the site. That's a DNS problem, not a web server problem. Learn to tell them apart.
+2. **TCP connection.** Browser connects to that IP on port 443 for HTTPS, 80 for HTTP. If it fails, the server is down, the port is closed or filtered, or the network is broken. Different error, different cause.
+3. **TLS handshake, HTTPS only.** Browser and server agree encryption, the server presents its certificate, the browser checks it matches the name, is trusted, and isn't expired. Certificate warnings on real sites are not to be clicked through. In lab, learn what a valid versus invalid certificate looks like on a site you own.
+4. **HTTP request.** Method (GET for a page), path, headers, cookies if any.
+5. **Server processing.** The server decides what was asked for, may talk to a database, may check a session, then picks a status: 200, 404, 403, 500.
+6. **HTTP response.** Status, headers, body. The browser renders it.
+7. **Repeat for every resource.** Images, stylesheets, scripts — each is another request through the same steps. That's why developer tools show dozens of requests for one page.
 
-DNS (Domain Name System) translates names to IPs, and IPs to names sometimes.
+When a page won't load, debug in that order instead of guessing: DNS, then connection, then TLS, then HTTP status, then content. That order saves hours, and it's exactly how experienced people troubleshoot.
 
-Example journey, in lab terms:
-1. You type `example.com` in browser (or a lab name in lab).
-2. Your computer asks a DNS server: "What IP is example.com?"
-3. DNS server answers, for example: "93.184.216.34" (example IP, not to memorise).
-4. Your computer then connects to that IP on port 80 or 443 for web.
+## The models: TCP/IP first, OSI as reference
 
-**Types of DNS records you will meet first (simple meanings):**
-- **A record:** Name -> IPv4 address. Example: `example.com` -> `93.184.216.34`.
-- **AAAA record:** Name -> IPv6 address.
-- **CNAME record:** Name -> another name (alias). Example: `www.example.com` -> `example.com`.
-- **MX record:** Name -> mail server for that domain.
-- **TXT record:** Name -> text data, often used for verification, like proving you own a domain in lab platforms.
+Beginners get told to memorise the seven OSI layers on day one. That's a shortcut to forgetting them. Learn the idea first, the names second, details when a tool forces you to.
 
-You do not need to memorise all DNS record types yet. Learn A, AAAA, CNAME first, then MX/TXT when you meet them in lab tools output.
+The TCP/IP model, top to bottom, is the one the real internet actually uses:
 
-**Practical design note — DNS security in simple terms:**
-DNS was designed for convenience, not security originally. That is why DNS spoofing/poisoning (tricking a computer into accepting a wrong IP for a name) is a known attack concept in labs, and why DNS over HTTPS (DoH) and DNSSEC (signed DNS answers) exist as defences. In lab, learn normal DNS first, then learn why signed/encrypted DNS helps, in concept, not by attacking real DNS servers.
+1. **Application** — what the program wants: HTTP, DNS, SSH, SMTP.
+2. **Transport** — how delivery works: TCP or UDP, and which port.
+3. **Internet** — how data crosses networks: IP addresses, routing.
+4. **Link** — how data moves on one local link: Ethernet, Wi-Fi, MAC addresses.
 
-### 4.2 DHCP — automatic address assignment, simply
+The OSI model has seven layers: Application, Presentation, Session, Transport, Network, Data Link, Physical. You'll meet those names in docs and in Wireshark. Keep them as reference, not as a memorisation project. Journey first, TCP/IP second, OSI when it shows up.
 
-DHCP (Dynamic Host Configuration Protocol) automatically gives computers on a network an IP address, subnet mask, gateway (router) address, and DNS server address, when they join the network.
+A MAC address is the hardware address burned into a network card — six pairs of hex digits like `aa:bb:cc:dd:ee:ff` in example form. It's used on a local link to deliver data to the right physical device, after IP has routed it to the right network. ARP is how a machine asks on its local network: "Who has `192.168.1.10`? Tell me your MAC." That's a local question, not an internet one.
 
-Simple idea: Instead of manually typing an IP for every computer in a lab, DHCP server hands out addresses automatically, from a pool, for a limited time (lease).
+One caution that saves bad design later: MAC addresses can be changed in software on your own lab machine, so MAC alone is a weak identity. Don't rely on MAC filtering as a real defence, and don't practise MAC spoofing on networks you don't own.
 
-Lab example: When your Kali VM starts on a home/lab network, it usually gets a private IP automatically via DHCP from the router. That is why `ip a` shows a private IP without you typing it.
+## Firewall, NAT, VPN
 
-Security note in lab terms: A rogue DHCP server (a fake one on a network you do not own) could hand out wrong gateway/DNS and redirect traffic — that is a known attack concept, and why you should only join networks you trust, and only run DHCP servers in your own private lab, never on a shared network without permission.
+A firewall is a gate with rules: what traffic is allowed in, allowed out, or blocked. A good default is default-deny — block everything, then allow one thing at a time with a note saying why. Default-allow is weaker because every new problem is allowed until someone gets around to blocking it. When you audit a lab firewall, ask whether it's default-deny and whether every allow rule is documented and needed.
 
-### 4.3 Full journey — what happens when you open a website in lab, step by step
+NAT lets many private machines share one public IP. Inside machines have private addresses; the router rewrites the source to its public IP on the way out and reverses it on the way back. NAT hides inside addresses by default, but it is not a firewall by itself. A forwarded port becomes reachable from outside on purpose — that forwarding needs to be deliberate and checked, never accidental.
 
-This is the most important algorithm in this file. Memorise the journey, not just the words.
+A VPN is an encrypted tunnel between your machine and another network, across the public internet. Outsiders can see a tunnel exists but not the traffic inside it, if the VPN is designed right. Companies use VPNs for remote workers; lab platforms sometimes use them to connect your VM to their lab network. A VPN is a tool with a design, not automatic safety — a weak or malicious VPN fails like anything else.
 
-```
-ALGORITHM: OPEN_A_WEBSITE_IN_LAB
+Lab design, in one line: private lab network, NAT and firewall by default, VPN only when a trusted lab platform requires it, and never a vulnerable lab VM sitting directly on the internet.
 
-INPUT: A name, for example https://example.com (or a lab site name in your lab)
-OUTPUT: A page shown in browser
+## How to understand any new lab network
 
-1. DNS LOOKUP
-   - Browser asks DNS: "What IP is example.com?"
-   - DNS answers with an IP, for example 93.184.216.34.
-   - If DNS fails, browser shows "cannot find site" — DNS problem, not web server problem. Learn to tell the difference.
+Take a new lab network — say your Kali VM and one lab server VM on a private network — and work it through in this order.
 
-2. TCP CONNECTION
-   - Browser connects to that IP on port 443 for HTTPS (or 80 for HTTP).
-   - TCP handshake happens: connect, confirm, ready.
-   - If connection fails, browser shows "cannot connect" — server down, port closed/filtered, or network problem. Different error, different cause.
+Start with your own machine: `ip a`, `hostname -I`. Note your private IP, your interfaces, localhost. Draw the map: boxes for each machine and the gateway, lines for the connections, private IPs on the boxes, and notes on what traffic flows where. Check listening services on your own machine with `ss -tln` and run the port audit on each one: localhost-only or exposed, needed or not.
 
-3. TLS HANDSHAKE (for HTTPS only)
-   - Browser and server agree on encryption, server shows its certificate.
-   - Browser checks certificate: is it for this name? Is it trusted? Is it expired?
-   - If certificate check fails, browser warns you. Do not ignore certificate warnings on real sites, and do not practise bypassing them on real sites. In lab, learn what a valid vs invalid certificate looks like on a lab site you own.
+Then check name resolution for a lab name with `dig`, and trace one simple journey through the map — your Kali box asking the lab server for a web page — step by step: DNS, TCP, HTTP request, response. Finally, check the gate: what's allowed in, what's allowed out, what's blocked by default, and is any lab service forwarded outside? If you can't answer a piece, that's a gap to study, not a failure — write it down as a question.
 
-4. HTTP REQUEST
-   - Browser sends a request: method (GET for a page), path (/), headers (browser type, cookies, etc.).
-   - Example request idea: "GET / HTTP/1.1, Host: example.com, User-Agent: ..."
+Then explain the whole thing in three minutes, out loud, without notes: how many machines, what IPs, what services are listening and why, and the path a web request takes. Anything you can't explain goes back to the start. That explanation is the real test of this file, and it's good English practice at the same time.
 
-5. SERVER PROCESSING
-   - Server receives request, checks what page/data is asked for, may talk to a database, may check session/cookie if you are logged in (lab only).
-   - Server decides: OK (200), Not Found (404), Forbidden (403), Server Error (500), etc.
+## Working through it on your own machine
 
-6. HTTP RESPONSE
-   - Server sends response: status code, headers, body (HTML page, image, data).
-   - Browser receives body, renders page: HTML structure, CSS style, JavaScript behaviour (if any).
+Start with the three commands and write down what you actually see: interfaces, private IP, localhost, and each listening port with a localhost-only versus exposed note. Draw the lab network on paper, boxes and IPs and ports, and keep public IPs out of any shared notes.
 
-7. REPEAT FOR EACH RESOURCE
-   - A modern page loads many resources: images, CSS, JS files, each as a separate request, following steps 2-6 again (often reusing connection).
-   - That is why browser developer tools in lab show many requests for one page, not just one.
+Read the `dig` section of the network-tools file, then run one DNS check in lab context and note the name asked, the IP returned, and what that IP means. Open a lab page you own, open developer tools, and note the method, the status code, and one header — then write the full journey for that page in your own words. Run the port audit for your own machine, five questions per port, and save it as a short dated note in your lab folder. Then record a three-minute explanation of how a website loads in your lab, without reading notes word for word.
 
-END ALGORITHM
-```
+Two habits to carry out of this file. First, an open port is not automatically a vulnerability — it's a service, and the questions after it decide whether it's a finding. Second, localhost-only is not the same as "no service." It's a service deliberately reachable only from the same machine, which for databases and internal services is usually good design. Check whether it's intentional. If it is, it's safer, not missing.
 
-**Practical design note:**
-When a website does not load in lab, use this journey to debug in order, not randomly:
-- DNS problem? (can you resolve name with `dig` in lab?)
-- Connection problem? (can you reach IP/port in lab?)
-- TLS problem? (certificate warning?)
-- HTTP problem? (status code 404/403/500?)
-- Content problem? (page loads but looks broken?)
-Debugging in journey order saves hours, and it is exactly how professionals troubleshoot networks and web apps.
+Next: network-tools — `ping`, `ip`, `ss`, `dig`, `curl`, and the Wireshark concept, each against your own machine and lab only.
 
----
-
-## 5. Models — OSI and TCP/IP, simplified (not memorised in full yet)
-
-Beginners are often told to memorise OSI 7 layers perfectly on day one. That is a shortcut to forgetting. Learn the idea first, names second, details later when you need them for Wireshark or advanced networking.
-
-### 5.1 TCP/IP model — 4 layers, practical for red teamers
-
-From top (user) to bottom (wire), simplified:
-
-1. **Application Layer:** What the user/program wants. Examples: HTTP (web), DNS (names), SSH (remote shell), SMTP (email).
-   - Question: What service is being used?
-2. **Transport Layer:** How data is delivered reliably or fast. TCP vs UDP (Section 3.3).
-   - Question: TCP or UDP? Which port?
-3. **Internet Layer:** How data gets from one network to another. IP addresses, routing.
-   - Question: Which IP? Which network? Via which router?
-4. **Link Layer:** How data moves on one local network link. Ethernet, Wi-Fi, MAC addresses (see below).
-   - Question: Which local device, by MAC address, on this local link?
-
-### 5.2 OSI model — 7 layers, for reference, not for memorising today
-
-OSI layers, top to bottom, for when you meet them in documentation or Wireshark:
-7. Application, 6. Presentation, 5. Session, 4. Transport, 3. Network, 2. Data Link, 1. Physical.
-
-Simple memory trick many students use: "All People Seem To Need Data Processing" (top to bottom, first letters A-P-S-T-N-D-P). Use it if it helps, but do not spend a week memorising OSI before you understand TCP/IP journey above. TCP/IP model is what the real internet actually uses, and it is enough for Phase 2.
-
-### 5.3 MAC address — hardware address, simply
-
-- MAC (Media Access Control) address is a hardware address burned into a network card, like a serial number for that card.
-- Example form: `aa:bb:cc:dd:ee:ff` (six pairs of hex digits, example only, not a real device).
-- MAC is used on a local network link to deliver data to the right physical device, after IP has routed data to the right network.
-- ARP (Address Resolution Protocol) is how a computer asks on a local network: "Who has IP 192.168.1.10? Tell me your MAC, so I can send you data locally." That is a local question, not an internet question.
-- Security note in lab terms: MAC addresses can be changed (spoofed) in software on your own lab machine, which is why MAC alone is not a strong security identity. Do not rely on MAC filtering alone as a defence in real design, and do not practise MAC spoofing on networks you do not own.
-
----
-
-## 6. Firewall, VPN, and NAT — security designs, simply
-
-### 6.1 Firewall — a gate with rules
-
-A firewall is a filter that decides which network traffic is allowed in, allowed out, or blocked, based on rules.
-
-Simple firewall rules, in lab terms:
-- Allow web out (port 443 out) for browsing.
-- Block incoming connections to all ports, except those deliberately allowed for a lab service.
-- Allow localhost traffic always (your own computer talking to itself should not be blocked by its own firewall, by design).
-
-**Practical design note:**
-Default-deny is a good firewall design: block everything by default, then allow only what is needed, one rule at a time, with a note why each rule exists. Default-allow (allow everything, block only known bad) is weaker, because new problems are allowed until someone blocks them. When you audit a lab firewall later, ask: "Is this default-deny? Is each allow rule documented and needed?"
-
-### 6.2 NAT — sharing one public IP, simply
-
-NAT (Network Address Translation) lets many private computers inside a network share one public IP on the outside.
-
-Simple idea: Inside computers have private IPs (192.168.x.x). Router has one public IP outside. When an inside computer sends data out, router changes source IP to its public IP, remembers which inside computer asked, and when reply comes back, router changes destination back to that inside computer's private IP.
-
-Why it matters for security design: NAT hides inside private IPs from the outside by default, but it is not a firewall by itself. A service forwarded through NAT (port forwarding) becomes reachable from outside on purpose — that forwarding must be deliberate, documented, and checked, never accidental in lab.
-
-### 6.3 VPN — private tunnel over public network, simply
-
-VPN (Virtual Private Network) creates an encrypted tunnel between your computer and another network, over the public internet, so traffic inside the tunnel is protected from eavesdropping on the way.
-
-Simple idea: Normal internet traffic is like postcards anyone on the way could read. VPN traffic is like a sealed envelope inside a tunnel — outsiders see a tunnel exists, but not the letters inside (if VPN is designed correctly).
-
-Why red teamers learn VPN concept:
-- Companies use VPN for remote workers to reach office network safely.
-- Lab platforms sometimes use VPN to connect your lab VM to their lab network safely.
-- VPN is not magic: if VPN itself has a weak design, or if a user connects to a malicious VPN, security can fail. Learn VPN as a tool with a design, not as automatic safety.
-
-**Practical design note for labs:**
-Never connect a lab vulnerable VM directly to the internet without a firewall/NAT design, and never use a VPN you do not trust for lab work with sensitive notes. Lab design = private lab network, NAT/firewall by default, VPN only when a trusted lab platform requires it, and only for that lab's network.
-
----
-
-## 7. Algorithm — How to understand any new network (lab only)
-
-Use this algorithm for every new lab network you meet. It is the network version of the Understand-A-System algorithm from computer basics.
-
-```
-ALGORITHM: UNDERSTAND_A_NETWORK (lab only)
-
-INPUT: A lab network you own, for example your Kali VM + one lab server VM on a private network
-OUTPUT: A network diagram + notes you can explain
-
-1. IDENTIFY YOUR OWN MACHINE
-   - Run: ip a, hostname -I (own machine only)
-   - Note: your private IP, your interfaces, your localhost IP.
-
-2. DRAW THE MAP
-   - Draw boxes: Your Kali VM, Router/Gateway, Lab Server VM, Internet (if any, for home context only).
-   - Draw lines: which box connects to which, wired or Wi-Fi, private lab network or home network?
-   - Label each box with its private/lab IP, and each line with what traffic flows there.
-
-3. CHECK LISTENING SERVICES (own machine only)
-   - Run: ss -tln (own machine only)
-   - For each listening port, note: port, service guess, localhost-only or exposed, should it be running?
-
-4. CHECK NAME RESOLUTION (lab only)
-   - Run: dig for a lab name or a public learning name, in lab context, as guided by network-tools file.
-   - Note: what IP did DNS return? Did it match expectation? If not, why?
-
-5. TRACE THE JOURNEY
-   - Pick one simple journey: "My Kali asks for a lab web page on lab server."
-   - Walk through Section 4.3 journey: DNS -> TCP -> HTTP request -> response -> render.
-   - Note where each step happens in your diagram: which box does DNS, which box is server, which port is used?
-
-6. CHECK THE GATE
-   - Ask firewall/NAT design questions for this lab:
-     - What is allowed in? What is allowed out? What is blocked by default?
-     - Is any lab service forwarded to outside? Should it be? If yes, why, and is it documented?
-   - If you cannot answer, that is a gap to learn, not a failure — note it as a question for next study.
-
-7. EXPLAIN IT
-   - Explain the network in 3 minutes, in simple English, without notes:
-     "This lab network has ____ computers. My Kali IP is ____. Lab server IP is ____. Services listening on my machine are ____, localhost-only or exposed because ____. A web request in this lab goes ____ -> ____ -> ____."
-   - If you cannot explain a part, that part goes back to Step 1.
-
-END ALGORITHM
-```
-
----
-
-## 8. Lab tasks — do these on your own machine / private lab only
-
-**Task 1 — Your own network:**
-```bash
-ip a
-hostname -I
-ss -tln
-```
-Write in notes: interfaces, private IP, localhost IP, listening ports with localhost-only vs exposed note for each.
-
-**Task 2 — Draw your lab network:**
-Draw on paper or in notes: Kali VM, router/gateway, lab server (if you have one), internet (if relevant for home context). Label IPs (private/lab only, do not publish public IP in shared notes). Label ports for services you found in Task 1.
-
-**Task 3 — DNS in lab context:**
-Read `network-tools.md` for `dig` examples, then run a DNS check for a public learning name in lab context, as guided there, and note: name asked, IP returned, time taken, and what that IP means. Do not run DNS checks in a loop or at high rate — one or two checks for learning is enough.
-
-**Task 4 — Web journey in lab:**
-Open a lab web page you own (or a legal lab platform page), open browser developer tools, note: request method, status code, and one header. Then write the full journey from Section 4.3 for that page, in your own words, step by step.
-
-**Task 5 — Port audit, own machine only:**
-For each listening port from Task 1, write the five audit questions from Section 3.2:
-1. What service?
-2. Should it run?
-3. Localhost-only or exposed? Why?
-4. Patched/updated in lab terms?
-5. Fix idea if it should not run or should be localhost-only?
-Save this as a short audit note, with date, in your lab notes folder. Do not publish private details without thinking first.
-
-**Task 6 — Explain a network in 3 minutes:**
-Record yourself explaining: "How does a computer find a website, connect, and show a page, in my lab?" Use the journey from Section 4.3, in simple English, without reading notes word for word. That recording is also English practice.
-
----
-
-## 9. Common mistakes — and how to fix them
-
-- **Mistake: Confusing IP and port.**
-  Fix: IP = which house. Port = which door/service in that house. You need both to reach a service: IP + port together, like `127.0.0.1:5432`.
-
-- **Mistake: Thinking open port = vulnerable, automatically.**
-  Fix: Open = service present. Next: what service, what version, should it be open, to whom, patched? Those questions decide if it is a finding in lab terms.
-
-- **Mistake: Thinking localhost-only means "no service".**
-  Fix: Localhost-only means service is running, but only reachable from same computer. That is often good design for databases and internal services in lab. Check: is localhost-only intentional? If yes, it is safer, not missing.
-
-- **Mistake: Scanning networks you do not own to "learn networking".**
-  Fix: Lab only, always. Learning networking does not require scanning others. Your own machine + private lab VMs give you all the practice you need for Phase 2.
-
-- **Mistake: Memorising OSI layers before understanding TCP/IP journey.**
-  Fix: Learn journey first (DNS -> TCP -> HTTP), then TCP/IP 4-layer model, then OSI as reference when you meet it in docs. Journey first, layers second.
-
-- **Mistake: Ignoring DNS when a website fails, and blaming the web server immediately.**
-  Fix: Debug in journey order: DNS? Connection? TLS? HTTP status? Content? Each error type points to a different layer, and a different fix.
-
-- **Mistake: Sharing public IP or lab details publicly without thinking.**
-  Fix: Private/lab IPs in private notes are fine for learning. Public IP, lab server details, or any report with private hostnames should be reviewed before publishing, and private details removed if not needed for the lesson.
-
----
-
-## 10. Checklist — can you move to Network Tools?
-
-Do not move to `network-tools.md` until you can check these boxes honestly (tools file is next, but basics must be solid first):
-
-- [ ] I can explain IP, private vs public, localhost, port, router, switch, DNS, packet, in simple English, without reading definitions word for word.
-- [ ] I can draw my lab network with boxes, IPs (private/lab only), and ports, and explain it in 3 minutes.
-- [ ] I ran `ip a`, `hostname -I`, `ss -tln` on my own machine, and I can explain each output, including localhost-only vs exposed.
-- [ ] I can walk through the full website journey (DNS -> TCP -> TLS -> HTTP request -> server -> response -> render) step by step, in order.
-- [ ] I can explain TCP vs UDP in simple words, with one example use for each.
-- [ ] I can explain DNS, DHCP, firewall, NAT, VPN in simple words, with one design note for each (why it exists, what risk it addresses).
-- [ ] I completed the port audit note for my own machine, with the five audit questions per port.
-- [ ] I recorded a 3-minute explanation of "How a website loads in my lab" in simple English.
-
-If a box is unchecked, that topic goes back through the Learning Algorithm from `01-roadmap/how-to-learn.md`, with lab tasks from Section 8. That is structured, not slow.
-
-**Next file:** `network-tools.md` — ping, ip, ss, dig, nslookup, traceroute concept, curl, Wireshark lab concept, each with purpose, lab example on your own machine only, output meaning line by line, mistakes, and network audit algorithm. No shortcuts, lab only.
-
----
-
-*Educational use only. All practice must be on systems you own or have written permission to test. Never scan or test networks, websites, or computers you do not own.*
+*Educational use only. All practice on systems you own or have written permission to test.*
