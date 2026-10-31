@@ -1,5 +1,7 @@
 ![Cybersecurity Red Team Roadmap Banner](assets/banner.svg)
 
+![Red Team Roadmap](Roadmap/red-team-roadmap.svg)
+
 # Cybersecurity Red Team Roadmap
 
 A specific path to becoming a red team professional, beginner to advanced. Not a general security notes dump. What to learn, in what order, why that order, which tools matter, and what proof you should have at the end of each phase. Red teaming is a trade: you learn it by doing lab work, reading output properly, and writing up what you found.
